@@ -1,0 +1,8 @@
+type: tracesim
+
+status:
+  class: receiver
+  stability:
+    alpha: [ traces ]
+  codeowners:
+    active: [ k4ji ]

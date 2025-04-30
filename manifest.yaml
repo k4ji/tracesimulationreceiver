@@ -1,0 +1,28 @@
+dist:
+  name: otelcol
+  description: OpenTelemetry Collector with tracesimulationreceiver
+  output_path: .
+
+exporters:
+  - gomod: go.opentelemetry.io/collector/exporter/debugexporter v0.124.0
+  - gomod: go.opentelemetry.io/collector/exporter/otlpexporter v0.124.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/datadogexporter v0.124.0
+
+processors:
+  - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.124.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.124.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor v0.124.0
+
+receivers:
+  - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.124.0
+  - gomod: github.com/k4ji/tracesimulationreceiver v0.1.0
+
+connectors:
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/connector/datadogconnector v0.124.0
+
+providers:
+  - gomod: go.opentelemetry.io/collector/confmap/provider/envprovider v1.18.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/fileprovider v1.18.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/httpprovider v1.18.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/httpsprovider v1.18.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/yamlprovider v1.18.0

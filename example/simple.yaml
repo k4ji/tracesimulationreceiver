@@ -1,0 +1,75 @@
+receivers:
+  tracesimulationreceiver:
+    global:
+      interval: 5s
+    blueprint:
+      type: service
+      service:
+        default:
+          startAfter: 0s
+          duration: 100ms
+          failWith:
+            probability: 0.0
+        services:
+          - name: client
+            resource:
+              service.version: 1.0.0
+            tasks:
+              - name: send_request
+                id: send_request
+                startAfter: 2s
+                duration: 2s
+                kind: client
+                attributes:
+                  team: mobile
+          - name: server
+            resource:
+              service.version: 1.1.0
+            tasks:
+              - name: accept_request
+                childOf: send_request
+                failWith:
+                  probability: 0.5
+                kind: server
+                children:
+                  - name: produce_message_event
+                    id: produce_message_event
+                    kind: producer
+                    failWith:
+                        probability: 0.2
+                    attributes:
+                      team: backend
+                      messaging.system: kafka
+                      messaging.destination: message-topic
+                      messaging.operation: publish
+          - name: consumer
+            resource:
+              service.version: 1.2.0
+            tasks:
+              - name: consume_message_event
+                startAfter: 5s
+                duration: 5s
+                kind: consumer
+                attributes:
+                  team: backend
+                  messaging.system: kafka
+                  messaging.destination: message-topic
+                  messaging.operation: consume
+                linkedTo:
+                  - produce_message_event
+                children:
+                  - name: process_message_event
+                    kind: internal
+
+exporters:
+  otlp/jaeger:
+    endpoint: host.docker.internal:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [ tracesimulationreceiver ]
+      processors: [ ]
+      exporters: [ otlp/jaeger ]
