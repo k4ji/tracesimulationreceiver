@@ -31,16 +31,45 @@ the [examples directory](./example) for real-world usage patterns.
 ## Use Cases
 
 - Benchmarking OpenTelemetry pipeline performance
-- Testing OpenTelemetry-compatible backends such as Datadog, Dynatrace, Jaeger, Honeycomb, NewRelic, and Splunk (listed alphabetically) 
+- Testing OpenTelemetry-compatible backends such as Datadog, Dynatrace, Jaeger, Honeycomb, New Relic, and Splunk (listed alphabetically) 
 - Demonstrating trace correlation and visualization tools
 
 ---
 
 ## Getting Started
 
-_A `Docker`-based quickstart will be added soon._
+### macOS and Linux (arm64)
+1. **Start Jaeger** (with OTLP enabled):
+```shell
+docker run --rm --name jaeger \
+  -e COLLECTOR_OTLP_ENABLED=true \
+  -p 16686:16686 \
+  -p 4317:4317 \
+  -p 4318:4318 \
+  jaegertracing/all-in-one:latest
+```  
+2. Run the OpenTelemetry Collector with Trace Simulation Receiver (This example uses the provided simple YAML config): 
+```shell
+docker run --rm \
+  -v "$(pwd)/example/simple.yaml:/etc/otelcol/config.yaml" \
+  ghcr.io/k4ji/otelcol-tracesimulationreceiver:latest \
+  --config /etc/otelcol/config.yaml
+ ```
 
-In the meantime, you can integrate the receiver into your OpenTelemetry Collector configuration and run it locally using the examples in [`./example`](./example).
+3. View the traces in Jaeger UI 
+Open http://localhost:16686 in your browser.
+
+You can also explore other simulation scenarios using the configurations in [`./example`](./example) as well.
+
+### Other Platforms
+1. Clone the repository:
+```shell
+git clone https://github.com/k4ji/otelcol-tracesimulationreceiver.git
+cd otel-tracesimulationreceiver
+```
+2. Build the Docker image (from the root of the repository):
+3. Follow the same steps from the macOS/Linux section above, starting with Step 1 (Jaeger setup).
+
 
 ---
 
