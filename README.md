@@ -50,4 +50,4 @@ This receiver is currently in **alpha** and may undergo breaking changes.
 
 ## License
 
-Licensed under the [Apache 2.0 License](../LICENSE).
+Licensed under the [Apache 2.0 License](./LICENSE).
