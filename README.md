@@ -31,7 +31,8 @@ the [examples directory](./example) for real-world usage patterns.
 ## Use Cases
 
 - Benchmarking OpenTelemetry pipeline performance
-- Testing OpenTelemetry-compatible backends such as Datadog, Dynatrace, Jaeger, Honeycomb, New Relic, and Splunk (listed alphabetically) 
+- Testing OpenTelemetry-compatible backends such as Datadog, Dynatrace, Jaeger, Honeycomb, New Relic, and Splunk (listed
+  alphabetically)
 - Demonstrating trace correlation and visualization tools
 
 ---
@@ -39,7 +40,9 @@ the [examples directory](./example) for real-world usage patterns.
 ## Getting Started
 
 ### macOS and Linux (arm64)
+
 1. **Start Jaeger** (with OTLP enabled):
+
 ```shell
 docker run --rm --name jaeger \
   -e COLLECTOR_OTLP_ENABLED=true \
@@ -48,28 +51,39 @@ docker run --rm --name jaeger \
   -p 4318:4318 \
   jaegertracing/all-in-one:latest
 ```  
-2. Run the OpenTelemetry Collector with Trace Simulation Receiver (This example uses the provided simple YAML config): 
+
+2. Fetch the example configuration file (defines a basic simulation setup):
+
+```shell
+curl -O https://raw.githubusercontent.com/k4ji/tracesimulationreceiver/main/example/simple.yaml
+```
+
+3. Run the OpenTelemetry Collector with Trace Simulation Receiver:
+
 ```shell
 docker run --rm \
-  -v "$(pwd)/example/simple.yaml:/etc/otelcol/config.yaml" \
+  -v "$(pwd)/simple.yaml:/etc/otelcol/config.yaml" \
   ghcr.io/k4ji/otelcol-tracesimulationreceiver:latest \
   --config /etc/otelcol/config.yaml
  ```
 
-3. View the traces in Jaeger UI 
-Open http://localhost:16686 in your browser.
+4. View the traces in Jaeger UI
+   Open http://localhost:16686 in your browser.
 
 You can also explore other simulation scenarios using the configurations in [`./example`](./example) as well.
 
 ### Other Platforms
-1. Clone the repository:
+
+1. Clone `otelcol-tracesimulationreceiver` repository to build the Docker image of the opentelemetry collector with the
+   trace simulation receiver:
+
 ```shell
 git clone https://github.com/k4ji/otelcol-tracesimulationreceiver.git
 cd otel-tracesimulationreceiver
 ```
+
 2. Build the Docker image (from the root of the repository):
 3. Follow the same steps from the macOS/Linux section above, starting with Step 1 (Jaeger setup).
-
 
 ---
 
