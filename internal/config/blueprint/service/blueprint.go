@@ -51,14 +51,14 @@ func (bp *Blueprint) Validate() error {
 			if delay == nil {
 				return fmt.Errorf("task %s must have a delay value or global default", task.Name)
 			}
-			if err := delay.Validate(); err != nil {
+			if err := delay.ValidateAfterDefaults(); err != nil {
 				return fmt.Errorf("task %s has invalid delay: %w", task.Name, err)
 			}
 			duration := task.Duration.WithDefault(bp.Default.Duration)
 			if duration == nil {
 				return fmt.Errorf("task %s must have a duration value or global default", task.Name)
 			}
-			if err := duration.Validate(); err != nil {
+			if err := duration.ValidateAfterDefaults(); err != nil {
 				return fmt.Errorf("task %s has invalid duration: %w", task.Name, err)
 			}
 			if task.FailWith.Probability == nil {

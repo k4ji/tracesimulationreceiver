@@ -18,7 +18,7 @@ type Duration struct {
 
 // To converts the duration to a model.Value
 func (d *Duration) To() (*task.Duration, error) {
-	if err := d.Validate(); err != nil {
+	if err := d.ValidateAfterDefaults(); err != nil {
 		return nil, err
 	}
 	td := TaskDuration{
@@ -36,8 +36,11 @@ func (d *Duration) To() (*task.Duration, error) {
 	return duration, nil
 }
 
-// Validate checks if the duration is valid
-func (d *Duration) Validate() error {
+// ValidateAfterDefaults checks if the duration is valid.
+// This is intentionally not named Validate to avoid automatic calls by `xconfmap`
+// before default values are applied. If needed, consider introducing a separate type
+// for pre-default unmarshaling.
+func (d *Duration) ValidateAfterDefaults() error {
 	if d == nil {
 		return fmt.Errorf("missing duration")
 	}

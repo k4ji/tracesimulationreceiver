@@ -18,7 +18,7 @@ type Delay struct {
 
 // To converts the delay to a model.Delay
 func (d *Delay) To() (*task.Delay, error) {
-	if err := d.Validate(); err != nil {
+	if err := d.ValidateAfterDefaults(); err != nil {
 		return nil, err
 	}
 	td := TaskDuration{
@@ -36,8 +36,11 @@ func (d *Delay) To() (*task.Delay, error) {
 	return delay, nil
 }
 
-// Validate checks if the delay is valid
-func (d *Delay) Validate() error {
+// ValidateAfterDefaults checks if the delay is valid.
+// This is intentionally not named Validate to avoid automatic calls by `xconfmap`
+// before default values are applied. If needed, consider introducing a separate type
+// for pre-default unmarshaling.
+func (d *Delay) ValidateAfterDefaults() error {
 	if d == nil {
 		return fmt.Errorf("missing delay")
 	}
