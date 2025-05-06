@@ -23,8 +23,14 @@ func TestConfig_Validate(t *testing.T) {
 								{
 									Name:       "task1",
 									ExternalID: ptrString("task1-id"),
-									StartAfter: ptrDuration(100 * time.Millisecond),
-									Duration:   ptrDuration(200 * time.Millisecond),
+									Delay: &service.Delay{
+										Value: ptrString("100ms"),
+										Mode:  ptrString("absolute"),
+									},
+									Duration: &service.Duration{
+										Value: ptrString("200ms"),
+										Mode:  ptrString("absolute"),
+									},
 									FailWith: service.FailureCondition{
 										Probability: ptrFloat(0.5),
 									},
@@ -58,8 +64,14 @@ func TestConfig_Validate(t *testing.T) {
 				Type: "service",
 				ServiceBlueprint: &service.Blueprint{
 					Default: service.DefaultValues{
-						StartAfter: ptrDuration(0),
-						Duration:   ptrDuration(1),
+						Delay: &service.Delay{
+							Value: ptrString("0"),
+							Mode:  ptrString("absolute"),
+						},
+						Duration: &service.Duration{
+							Value: ptrString("1ns"),
+							Mode:  ptrString("absolute"),
+						},
 						FailWith: service.FailureCondition{
 							Probability: ptrFloat(0.0),
 						},
@@ -71,6 +83,14 @@ func TestConfig_Validate(t *testing.T) {
 								{
 									Name:       "task1",
 									ExternalID: &duplicateID,
+									Delay: &service.Delay{
+										Value: ptrString("0"),
+										Mode:  ptrString("absolute"),
+									},
+									Duration: &service.Duration{
+										Value: ptrString("1ns"),
+										Mode:  ptrString("absolute"),
+									},
 								},
 							},
 						},
@@ -80,6 +100,14 @@ func TestConfig_Validate(t *testing.T) {
 								{
 									Name:       "task2",
 									ExternalID: &duplicateID,
+									Delay: &service.Delay{
+										Value: ptrString("0"),
+										Mode:  ptrString("absolute"),
+									},
+									Duration: &service.Duration{
+										Value: ptrString("1ns"),
+										Mode:  ptrString("absolute"),
+									},
 								},
 							},
 						},
@@ -98,8 +126,8 @@ func TestConfig_Validate(t *testing.T) {
 				Type: "service",
 				ServiceBlueprint: &service.Blueprint{
 					Default: service.DefaultValues{
-						StartAfter: nil,
-						Duration:   nil,
+						Delay:    nil,
+						Duration: nil,
 						FailWith: service.FailureCondition{
 							Probability: nil,
 						},
@@ -109,9 +137,14 @@ func TestConfig_Validate(t *testing.T) {
 							Name: "service1",
 							Tasks: []service.Task{
 								{
-									Name:       "task1",
-									StartAfter: ptrDuration(0),
-									Duration:   ptrDuration(1),
+									Name: "task1",
+									Delay: &service.Delay{
+										Value: ptrString("0"),
+										Mode:  ptrString("absolute"),
+									}, Duration: &service.Duration{
+										Value: ptrString("1ns"),
+										Mode:  ptrString("absolute"),
+									},
 									FailWith: service.FailureCondition{
 										Probability: ptrFloat(1.0),
 									},
@@ -123,33 +156,41 @@ func TestConfig_Validate(t *testing.T) {
 			},
 		}
 
-		t.Run("invalid StartAfter", func(t *testing.T) {
-			cfg.Blueprint.ServiceBlueprint.Services[0].Tasks[0].StartAfter = ptrDuration(-1)
+		t.Run("invalid Delay", func(t *testing.T) {
+			cfg.Blueprint.ServiceBlueprint.Services[0].Tasks[0].Delay = &service.Delay{
+				Value: ptrString("-1ns"),
+				Mode:  ptrString("absolute"),
+			}
 			err := cfg.Validate()
 			assert.Error(t, err)
-			assert.Contains(t, err.Error(), "must have a StartAfter value greater than or equal to 0")
+			assert.Contains(t, err.Error(), "invalid delay: absolute delay must be non-negative")
 		})
 
 		t.Run("invalid Duration", func(t *testing.T) {
-			cfg.Blueprint.ServiceBlueprint.Services[0].Tasks[0].StartAfter = ptrDuration(100 * time.Millisecond)
-			cfg.Blueprint.ServiceBlueprint.Services[0].Tasks[0].Duration = ptrDuration(0)
+			cfg.Blueprint.ServiceBlueprint.Services[0].Tasks[0].Delay = &service.Delay{
+				Value: ptrString("100ms"),
+				Mode:  ptrString("absolute"),
+			}
+			cfg.Blueprint.ServiceBlueprint.Services[0].Tasks[0].Duration = &service.Duration{
+				Value: ptrString("0"),
+				Mode:  ptrString("absolute"),
+			}
 			err := cfg.Validate()
 			assert.Error(t, err)
-			assert.Contains(t, err.Error(), "must have a Duration value greater than 0")
+			assert.Contains(t, err.Error(), "duration must be greater than 0")
 		})
 
 		t.Run("invalid FailWithProbability", func(t *testing.T) {
-			cfg.Blueprint.ServiceBlueprint.Services[0].Tasks[0].Duration = ptrDuration(200 * time.Millisecond)
+			cfg.Blueprint.ServiceBlueprint.Services[0].Tasks[0].Duration = &service.Duration{
+				Value: ptrString("200ms"),
+				Mode:  ptrString("absolute"),
+			}
 			cfg.Blueprint.ServiceBlueprint.Services[0].Tasks[0].FailWith.Probability = ptrFloat(1.5)
 			err := cfg.Validate()
 			assert.Error(t, err)
 			assert.Contains(t, err.Error(), "must have a FailWithProbability value between 0.0 and 1.0")
 		})
 	})
-}
-
-func ptrDuration(d time.Duration) *time.Duration {
-	return &d
 }
 
 func ptrFloat(f float64) *float64 { return &f }

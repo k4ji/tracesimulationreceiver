@@ -3,7 +3,7 @@ module github.com/k4ji/tracesimulationreceiver
 go 1.24.1
 
 require (
-	github.com/k4ji/tracesimulator v0.1.0
+	github.com/k4ji/tracesimulator v0.2.0
 	github.com/stretchr/testify v1.10.0
 	go.opentelemetry.io/collector/component v1.30.0
 	go.opentelemetry.io/collector/component/componenttest v0.124.0

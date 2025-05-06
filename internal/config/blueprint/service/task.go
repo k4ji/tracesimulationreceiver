@@ -3,7 +3,6 @@ package service
 import (
 	"github.com/k4ji/tracesimulator/pkg/blueprint/service/model"
 	domaintask "github.com/k4ji/tracesimulator/pkg/model/task"
-	"time"
 )
 
 // Task represents a task in the blueprint.
@@ -14,11 +13,11 @@ type Task struct {
 	// ExternalID is an optional external identifier for the task.
 	ExternalID *string `mapstructure:"id"`
 
-	// StartAfter specifies the delay (in milliseconds) before the task starts.
-	StartAfter *time.Duration `mapstructure:"startAfter"`
+	// Delay specifies the delay in duration or relative duration to parent duration before the task starts.
+	Delay *Delay `mapstructure:"delay"`
 
-	// Duration specifies the duration (in milliseconds) of the task.
-	Duration *time.Duration `mapstructure:"duration"`
+	// Duration specifies the duration of the task.
+	Duration *Duration `mapstructure:"duration"`
 
 	// Kind specifies the type or category of the task (e.g., "client", "server").
 	Kind string `mapstructure:"kind"`
@@ -45,7 +44,14 @@ func (t *Task) To() (*model.Task, error) {
 	var parentID *domaintask.ExternalID
 	var linkedTo []*domaintask.ExternalID
 	var children []model.Task
-	var err error
+	delay, err := t.Delay.To()
+	if err != nil {
+		return nil, err
+	}
+	duration, err := t.Duration.To()
+	if err != nil {
+		return nil, err
+	}
 	if t.ExternalID != nil {
 		externalID, err = domaintask.NewExternalID(*t.ExternalID)
 		if err != nil {
@@ -80,8 +86,8 @@ func (t *Task) To() (*model.Task, error) {
 	return &model.Task{
 		Name:                t.Name,
 		ExternalID:          externalID,
-		StartAfter:          *t.StartAfter,
-		Duration:            *t.Duration,
+		Delay:               *delay,
+		Duration:            *duration,
 		Kind:                t.Kind,
 		Attributes:          t.Attributes,
 		Children:            children,

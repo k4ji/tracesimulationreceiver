@@ -5,7 +5,6 @@ import (
 	"github.com/k4ji/tracesimulator/pkg/blueprint"
 	"github.com/k4ji/tracesimulator/pkg/blueprint/service"
 	"github.com/k4ji/tracesimulator/pkg/blueprint/service/model"
-	"time"
 )
 
 type Blueprint struct {
@@ -17,11 +16,11 @@ type Blueprint struct {
 
 // DefaultValues defines default values for task parameters.
 type DefaultValues struct {
-	// StartAfter specifies the default wait time (in milliseconds) for tasks without a specified wait value.
-	StartAfter *time.Duration `mapstructure:"startAfter"`
+	// Delay specifies the default wait time for tasks
+	Delay *Delay `mapstructure:"delay"`
 
-	// Duration specifies the default duration (in milliseconds) for tasks without a specified duration value.
-	Duration *time.Duration `mapstructure:"duration"`
+	// Duration specifies the default duration for tasks
+	Duration *Duration `mapstructure:"duration"`
 
 	// FailWith specifies the default failure conditions for tasks.
 	FailWith FailureCondition `mapstructure:"failWith"`
@@ -34,12 +33,6 @@ type FailureCondition struct {
 
 // Validate checks the configuration for errors.
 func (bp *Blueprint) Validate() error {
-	if bp.Default.StartAfter != nil && *bp.Default.StartAfter < 0 {
-		return fmt.Errorf("global default wait must be greater than or equal to 0")
-	}
-	if bp.Default.Duration != nil && *bp.Default.Duration <= 0 {
-		return fmt.Errorf("global default duration must be greater than 0")
-	}
 	if bp.Default.FailWith.Probability != nil && (*bp.Default.FailWith.Probability < 0.0 || *bp.Default.FailWith.Probability > 1.0) {
 		return fmt.Errorf("global default failWith.probability value between 0.0 and 1.0")
 	}
@@ -54,23 +47,19 @@ func (bp *Blueprint) Validate() error {
 					taskIDs[*task.ExternalID] = struct{}{}
 				}
 			}
-			if task.StartAfter == nil {
-				if bp.Default.StartAfter == nil {
-					return fmt.Errorf("task %s must have a StartAfter value or global default", task.Name)
-				}
-			} else {
-				if *task.StartAfter < 0 {
-					return fmt.Errorf("task %s must have a StartAfter value greater than or equal to 0", task.Name)
-				}
+			delay := task.Delay.WithDefault(bp.Default.Delay)
+			if delay == nil {
+				return fmt.Errorf("task %s must have a delay value or global default", task.Name)
 			}
-			if task.Duration == nil {
-				if bp.Default.Duration == nil {
-					return fmt.Errorf("task %s must have a Duration value or global default", task.Name)
-				}
-			} else {
-				if *task.Duration <= 0 {
-					return fmt.Errorf("task %s must have a Duration value greater than 0", task.Name)
-				}
+			if err := delay.Validate(); err != nil {
+				return fmt.Errorf("task %s has invalid delay: %w", task.Name, err)
+			}
+			duration := task.Duration.WithDefault(bp.Default.Duration)
+			if duration == nil {
+				return fmt.Errorf("task %s must have a duration value or global default", task.Name)
+			}
+			if err := duration.Validate(); err != nil {
+				return fmt.Errorf("task %s has invalid duration: %w", task.Name, err)
 			}
 			if task.FailWith.Probability == nil {
 				if bp.Default.FailWith.Probability == nil {
@@ -106,12 +95,8 @@ func (bp *Blueprint) prepare() {
 	var applyDefaults func(tasks []*Task)
 	applyDefaults = func(tasks []*Task) {
 		for _, task := range tasks {
-			if task.StartAfter == nil {
-				task.StartAfter = bp.Default.StartAfter
-			}
-			if task.Duration == nil {
-				task.Duration = bp.Default.Duration
-			}
+			task.Delay = task.Delay.WithDefault(bp.Default.Delay)
+			task.Duration = task.Duration.WithDefault(bp.Default.Duration)
 			if task.FailWith.Probability == nil {
 				task.FailWith.Probability = bp.Default.FailWith.Probability
 			}
@@ -137,8 +122,8 @@ func (bp *Blueprint) prepare() {
 func Default() *Blueprint {
 	return &Blueprint{
 		Default: DefaultValues{
-			StartAfter: nil,
-			Duration:   nil,
+			Delay:    nil,
+			Duration: nil,
 			FailWith: FailureCondition{
 				Probability: nil,
 			},

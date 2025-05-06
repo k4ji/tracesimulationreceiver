@@ -19,12 +19,28 @@ receivers:
         ## @param default - object - optional
         ## Default wait time and duration for tasks if not specified individually.
         default:
-          ## @param startAfter - duration - optional
-          ## Default wait time before starting a task, must be greater than or equal to 0.
-          startAfter: 1s
+          ## @param delay - object - optional
+          ## Default wait time before starting a task
+          delay:
+            ## @param for - string - optional
+            ## Default wait time in the format of either
+            ## - duration (e.g., 1s, 2m), must be greater than or equal to 0.
+            ## - float (e.g., 0.5 for 50% of the parent task duration), must be greater than or equal to 0 and cannot be set for root tasks.
+            for: 10ms
+            ## @param as - string - optional
+            ## Type of delay. Can be 'absolute' or 'relative'.
+            as: absolute
           ## @param duration - duration - optional
           ## Default duration of the task, must be greater than 0.
-          duration: 1s
+          duration:
+            ## @param for - string - optional
+            ## Default duration in the format of either
+            ## - duration (e.g., 1s, 2m), must be greater than 0.
+            ## - float (e.g., 0.5 for 50% of the parent task duration), must be greater than 0 and cannot be set for root tasks.
+            for: "0.8"
+            ## @param as - string - optional
+            ## Type of duration. Can be 'absolute' or 'relative'.
+            as: relative
           ## @param failWith - object - optional
           ## Default configuration for simulating task failures.
           failWith:
@@ -51,12 +67,34 @@ receivers:
                 ## Unique identifier for the task (used for child/linked relationships and span links)
                 ## Must match the regex `^[a-zA-Z0-9_-]+$`.
                 id: send_request
-                ## @param startAfter - duration - optional if default.startAfter is set
-                ## Wait time before starting the task.
-                startAfter: 2s
+                ## @param delay - object - optional if default.delay is set
+                ## Wait time before starting a task.
+                delay:
+                  ## @param for - string - optional if default.delay.for is set
+                  ## Wait time in one of the following formats:
+                  ## - Duration: e.g., 1s, 2m (must be greater than or equal to 0).
+                  ## - Float: e.g., 0.5 (50% of the parent task duration, must be greater than or equal to 0 and cannot be set for root tasks).
+                  for: 0s
+                  ## @param as - string - optional if default.delay.as is set
+                  ## Type of delay. Can be one of:
+                  ## - 'absolute': Specifies a fixed delay.
+                  ## - 'relative': Specifies a delay relative to the parent task.
+                  as: absolute
                 ## @param duration - duration - optional if default.duration is set
-                ## Duration of the task.
-                duration: 2s
+                ## Default duration of the task, must be greater than 0.
+                duration:
+                  ## @param for - string - optional if default.duration.for is set
+                  ## Default duration in one of the following formats:
+                  ## - Absolute: duration (e.g., 1s, 2m), must be greater than 0.
+                  ## - Relative: float (e.g., 0.5 for 50% of the parent task duration), must be greater than 0 and cannot be set for root tasks.
+                  ## Root tasks must specify an absolute duration.
+                  for: 1s
+                  ## @param as - string - optional if default.duration.as is set
+                  ## Type of duration. Can be one of:
+                  ## - 'absolute': Specifies a fixed duration.
+                  ## - 'relative': Specifies a duration relative to the parent task.
+                  ## Root tasks must specify an absolute duration.
+                  as: absolute
                 ## @param kind - string - optional
                 ## Kind of the task. Can be 'client', 'server', 'producer', 'consumer', or 'internal'.
                 kind: client
@@ -91,8 +129,9 @@ receivers:
           - name: consumer
             tasks:
               - name: consume_message_event
-                startAfter: 5s
-                duration: 5s
+                duration:
+                  for: 200ms
+                  as: absolute
                 kind: consumer
                 ## @param linkedTo - list of strings - optional
                 ## List of task ids that this task is linked to.
