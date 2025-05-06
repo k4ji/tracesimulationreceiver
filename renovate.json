@@ -1,0 +1,48 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "labels": [
+    "renovatebot",
+    "dependencies"
+  ],
+  "constraints": {
+    "go": "1.24"
+  },
+  "extends": [
+    "config:recommended",
+    "schedule:daily"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchUpdateTypes": [
+        "pin",
+        "pinDigest",
+        "digest",
+        "lockFileMaintenance",
+        "replacement"
+      ],
+      "enabled": false
+    },
+    {
+      "matchManagers": [
+        "gomod"
+      ],
+      "groupName": "All go.opentelemetry.io/collector packages",
+      "matchPackageNames": [
+        "go.opentelemetry.io/collector{/,}**"
+      ]
+    },
+    {
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "github-actions deps"
+    }
+  ],
+  "prConcurrentLimit": 10,
+  "suppressNotifications": [
+    "prEditedNotification"
+  ]
+}
