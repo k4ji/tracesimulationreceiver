@@ -1,4 +1,4 @@
-name: Lint
+name: CI
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  lint:
+  lint-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,4 +23,7 @@ jobs:
         uses: golangci/golangci-lint-action@v7
         with:
           version: v2.0
+
+      - name: Run tests
+        run: go test ./...
 
