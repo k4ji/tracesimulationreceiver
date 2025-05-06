@@ -6,8 +6,12 @@ receivers:
       type: service
       service:
         default:
-          startAfter: 0s
-          duration: 100ms
+          delay:
+            for: "0.1"
+            as: relative
+          duration:
+            for: "0.8"
+            as: relative
           failWith:
             probability: 0.0
         services:
@@ -17,8 +21,12 @@ receivers:
             tasks:
               - name: send_request
                 id: send_request
-                startAfter: 2s
-                duration: 2s
+                delay:
+                  for: 0s
+                  as: absolute
+                duration:
+                  for: 2s
+                  as: absolute
                 kind: client
                 attributes:
                   team: mobile
@@ -35,8 +43,10 @@ receivers:
                   - name: produce_message_event
                     id: produce_message_event
                     kind: producer
+                    duration:
+                      for: "0.3"
                     failWith:
-                        probability: 0.2
+                      probability: 0.2
                     attributes:
                       team: backend
                       messaging.system: kafka
@@ -47,8 +57,11 @@ receivers:
               service.version: 1.2.0
             tasks:
               - name: consume_message_event
-                startAfter: 5s
-                duration: 5s
+                delay:
+                    for: 1s
+                duration:
+                    for: 200ms
+                    as: absolute
                 kind: consumer
                 attributes:
                   team: backend

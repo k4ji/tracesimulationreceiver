@@ -6,8 +6,12 @@ receivers:
       type: service
       service:
         default:
-          startAfter: 0s
-          duration: 1s
+          delay:
+            for: "0.05"
+            as: relative
+          duration:
+            for: "0.8"
+            as: relative
           failWith:
             probability: 0.1
         services:
@@ -19,7 +23,12 @@ receivers:
               - name: send_message_request
                 id: ios_send_message_request
                 kind: client
-                duration: 2s
+                delay:
+                  for: 0s
+                  as: absolute
+                duration:
+                  for: 2s
+                  as: absolute
                 failWith:
                   probability: 0.2
 
@@ -31,19 +40,19 @@ receivers:
                 id: api_receive_api_request
                 kind: server
                 childOf: ios_send_message_request
-                startAfter: 50ms
-                duration: 1.5s
                 children:
                   - name: call_auth_service
                     id: call_auth_service
                     kind: client
-                    startAfter: 30ms
-                    duration: 120ms
+                    duration:
+                      for: "0.1"
                   - name: route_message_request
                     id: route_message_request
                     kind: client
-                    startAfter: 200ms
-                    duration: 1s
+                    delay:
+                      for: "0.3"
+                    duration:
+                      for: "0.5"
 
           - name: auth_service
             resource:
@@ -52,8 +61,6 @@ receivers:
               - name: validate_user_session
                 kind: server
                 childOf: call_auth_service
-                startAfter: 20ms
-                duration: 100ms
                 attributes:
                   http.target: /api/v1/session/validate
                   http.method: GET
@@ -65,14 +72,10 @@ receivers:
               - name: receive_write_request
                 kind: server
                 childOf: route_message_request
-                startAfter: 50ms
-                duration: 400ms
                 children:
                   - name: produce_message_kafka
                     id: produce_message_kafka
                     kind: producer
-                    startAfter: 80ms
-                    duration: 150ms
                     attributes:
                       messaging.system: kafka
                       messaging.destination: message-topic
@@ -85,7 +88,12 @@ receivers:
             tasks:
               - name: consume_kafka_message
                 kind: consumer
-                startAfter: 1200ms
+                delay:
+                  for: 2s
+                  as: absolute
+                duration:
+                  for: 200ms
+                  as: absolute
                 linkedTo: [ produce_message_kafka ]
                 attributes:
                   messaging.system: kafka
@@ -93,8 +101,8 @@ receivers:
                 children:
                   - name: update_read_model
                     kind: client
-                    startAfter: 150ms
-                    duration: 150ms
+                    duration:
+                      for: "0.1"
                     attributes:
                       db.operation: update_read_model
                       db.system: postgres
@@ -102,8 +110,10 @@ receivers:
                   - name: trigger_notification_event
                     id: trigger_notification_event-1
                     kind: producer
-                    startAfter: 350ms
-                    duration: 100ms
+                    delay:
+                      for: "0.4"
+                    duration:
+                      for: "0.1"
                     attributes:
                       messaging.operation: publish
                       messaging.system: kafka
@@ -116,7 +126,12 @@ receivers:
             tasks:
               - name: consume_kafka_message
                 kind: consumer
-                startAfter: 1250ms
+                delay:
+                  for: 2s
+                  as: absolute
+                duration:
+                  for: 800ms
+                  as: absolute
                 linkedTo: [ produce_message_kafka ]
                 attributes:
                   messaging.system: kafka
@@ -124,8 +139,8 @@ receivers:
                 children:
                   - name: update_read_model
                     kind: client
-                    startAfter: 130ms
-                    duration: 140ms
+                    duration:
+                      for: "0.1"
                     attributes:
                       db.operation: update_read_model
                       db.system: postgres
@@ -133,8 +148,10 @@ receivers:
                   - name: trigger_notification_event
                     id: trigger_notification_event-2
                     kind: producer
-                    startAfter: 320ms
-                    duration: 120ms
+                    delay:
+                      for: "0.4"
+                    duration:
+                      for: "0.1"
                     attributes:
                       messaging.operation: publish
                       messaging.system: kafka
@@ -146,8 +163,12 @@ receivers:
             tasks:
               - name: consume_notification
                 kind: consumer
-                startAfter: 1700ms
-                duration: 150ms
+                delay:
+                  for: 3s
+                  as: absolute
+                duration:
+                  for: 1s
+                  as: absolute
                 linkedTo: [ trigger_notification_event-1, trigger_notification_event-2 ]
                 attributes:
                   messaging.system: kafka
@@ -155,8 +176,6 @@ receivers:
                 children:
                   - name: send_email_notification
                     kind: client
-                    startAfter: 100ms
-                    duration: 130ms
                     attributes:
                       messaging.system: email-service
 
@@ -166,8 +185,12 @@ receivers:
             tasks:
               - name: log_message_event
                 kind: consumer
-                startAfter: 2s
-                duration: 120ms
+                delay:
+                  for: 2s
+                  as: absolute
+                duration:
+                  for: 500ms
+                  as: absolute
                 linkedTo: [ produce_message_kafka ]
                 attributes:
                   messaging.system: kafka
@@ -175,8 +198,6 @@ receivers:
                 children:
                   - name: archive_message_event
                     kind: client
-                    startAfter: 150ms
-                    duration: 120ms
                     attributes:
                       rpc.service: S3
                       aws.s3.bucket: message-archive
@@ -189,8 +210,12 @@ receivers:
       type: service
       service:
         default:
-          startAfter: 0s
-          duration: 1s
+          delay:
+            for: "0.05"
+            as: relative
+          duration:
+            for: "0.8"
+            as: relative
           failWith:
             probability: 0.0
         services:
@@ -202,7 +227,12 @@ receivers:
               - name: read_message
                 id: ios_read_message_request
                 kind: client
-                duration: 2s
+                delay:
+                  for: 0s
+                  as: absolute
+                duration:
+                  for: 500ms
+                  as: absolute
 
           - name: api_gateway
             resource:
@@ -211,19 +241,19 @@ receivers:
               - name: receive_read_request
                 kind: server
                 childOf: ios_read_message_request
-                startAfter: 30ms
-                duration: 1.5s
                 children:
                   - name: call_auth_service_read
                     id: call_auth_service_read
                     kind: client
-                    startAfter: 20ms
-                    duration: 120ms
+                    duration:
+                      for: "0.1"
                   - name: route_message_read
                     id: route_message_read
                     kind: client
-                    startAfter: 180ms
-                    duration: 1s
+                    delay:
+                      for: "0.3"
+                    duration:
+                      for: "0.3"
 
           - name: auth_service
             resource:
@@ -232,8 +262,6 @@ receivers:
               - name: validate_user_session_read
                 kind: server
                 childOf: call_auth_service_read
-                startAfter: 10ms
-                duration: 100ms
                 attributes:
                   http.target: /api/v1/session/validate
                   http.method: GET
@@ -245,28 +273,30 @@ receivers:
               - name: receive_read_request_backend
                 kind: server
                 childOf: route_message_read
-                startAfter: 50ms
-                duration: 800ms
                 children:
                   - name: redis_cache_lookup
                     kind: client
-                    startAfter: 50ms
-                    duration: 70ms
+                    duration:
+                      for: "0.1"
                     attributes:
                       db.system: redis
                       db.operation: get
-                  - name: read_enriched_message
+                  - name: fetch_message
                     kind: client
-                    startAfter: 300ms
-                    duration: 120ms
+                    delay:
+                      for: "0.2"
+                    duration:
+                      for: "0.2"
                     attributes:
                       db.system: postgres
                       db.operation: select_enriched_message
                       db.table: messages
                   - name: send_read_response
                     kind: server
-                    startAfter: 600ms
-                    duration: 50ms
+                    delay:
+                      for: "0.5"
+                    duration:
+                      for: "0.4"
 
   tracesimulationreceiver/search_message_request_v1:
     global:
@@ -275,8 +305,12 @@ receivers:
       type: service
       service:
         default:
-          startAfter: 0s
-          duration: 1s
+          delay:
+            for: "0.05"
+            as: relative
+          duration:
+            for: "0.8"
+            as: relative
           failWith:
             probability: 0.2
         services:
@@ -288,7 +322,12 @@ receivers:
               - name: search_message_request
                 id: ios_search_message_request
                 kind: client
-                duration: 2000ms
+                delay:
+                  for: 0s
+                  as: absolute
+                duration:
+                  for: 500ms
+                  as: absolute
 
           - name: api_gateway
             resource:
@@ -298,19 +337,19 @@ receivers:
                 id: api_receive_search_request
                 kind: server
                 childOf: ios_search_message_request
-                startAfter: 30ms
-                duration: 1.5s
                 children:
                   - name: call_auth_service_search
                     id: call_auth_service_search
                     kind: client
-                    startAfter: 20ms
-                    duration: 110ms
+                    duration:
+                      for: "0.1"
                   - name: route_search_request
                     id: route_search_request
                     kind: client
-                    startAfter: 180ms
-                    duration: 650ms
+                    delay:
+                      for: "0.3"
+                    duration:
+                      for: "0.5"
 
           - name: auth_service
             resource:
@@ -319,8 +358,6 @@ receivers:
               - name: validate_user_session_search
                 kind: server
                 childOf: call_auth_service_search
-                startAfter: 10ms
-                duration: 90ms
                 attributes:
                   http.target: /api/v1/session/validate
                   http.method: GET
@@ -332,8 +369,6 @@ receivers:
               - name: perform_search
                 kind: server
                 childOf: route_search_request
-                startAfter: 30ms
-                duration: 550ms
                 attributes:
                   db.system: elasticsearch
                   db.operation: search
@@ -345,8 +380,12 @@ receivers:
       type: service
       service:
         default:
-          startAfter: 0s
-          duration: 1s
+          delay:
+            for: "0.05"
+            as: relative
+          duration:
+            for: "0.8"
+            as: relative
           failWith:
             probability: 0.0
         services:
@@ -358,7 +397,12 @@ receivers:
               - name: search_message_request
                 id: ios_search_message_request
                 kind: client
-                duration: 2s
+                delay:
+                  for: 0s
+                  as: absolute
+                duration:
+                  for: 500ms
+                  as: absolute
                 failWith:
                   probability: 0.8
 
@@ -370,19 +414,19 @@ receivers:
                 id: api_receive_search_request
                 kind: server
                 childOf: ios_search_message_request
-                startAfter: 40ms
-                duration: 1.5s
                 children:
                   - name: call_auth_service_search
                     id: call_auth_service_search
                     kind: client
-                    startAfter: 25ms
-                    duration: 100ms
+                    duration:
+                      for: "0.1"
                   - name: route_search_request
                     id: route_search_request
                     kind: client
-                    startAfter: 200ms
-                    duration: 650ms
+                    delay:
+                      for: "0.3"
+                    duration:
+                      for: "0.5"
 
           - name: auth_service
             resource:
@@ -391,8 +435,6 @@ receivers:
               - name: validate_user_session_search
                 kind: server
                 childOf: call_auth_service_search
-                startAfter: 10ms
-                duration: 90ms
                 attributes:
                   http.target: /api/v1/session/validate
                   http.method: GET
@@ -404,8 +446,6 @@ receivers:
               - name: perform_search
                 kind: server
                 childOf: route_search_request
-                startAfter: 40ms
-                duration: 550ms
                 attributes:
                   db.system: elasticsearch
                   db.operation: search
@@ -417,8 +457,12 @@ receivers:
       type: service
       service:
         default:
-          startAfter: 0s
-          duration: 1s
+          delay:
+            for: "0.05"
+            as: relative
+          duration:
+            for: "0.8"
+            as: relative
           failWith:
             probability: 0.01
         services:
@@ -430,7 +474,14 @@ receivers:
               - name: search_message_request
                 id: ios_search_message_request
                 kind: client
-                duration: 2s
+                delay:
+                  for: 0s
+                  as: absolute
+                duration:
+                  for: 500ms
+                  as: absolute
+                failWith:
+                  probability: 0.8
 
           - name: api_gateway
             resource:
@@ -440,19 +491,19 @@ receivers:
                 id: api_receive_search_request
                 kind: server
                 childOf: ios_search_message_request
-                startAfter: 30ms
-                duration: 1.5s
                 children:
                   - name: call_auth_service_search
                     id: call_auth_service_search
                     kind: client
-                    startAfter: 20ms
-                    duration: 100ms
+                    duration:
+                      for: "0.1"
                   - name: route_search_request
                     id: route_search_request
                     kind: client
-                    startAfter: 190ms
-                    duration: 650ms
+                    delay:
+                      for: "0.3"
+                    duration:
+                      for: "0.5"
 
           - name: auth_service
             resource:
@@ -461,8 +512,6 @@ receivers:
               - name: validate_user_session_search
                 kind: server
                 childOf: call_auth_service_search
-                startAfter: 10ms
-                duration: 90ms
                 attributes:
                   http.target: /api/v1/session/validate
                   http.method: GET
@@ -474,8 +523,6 @@ receivers:
               - name: perform_search
                 kind: server
                 childOf: route_search_request
-                startAfter: 30ms
-                duration: 550ms
                 attributes:
                   db.system: elasticsearch
                   db.operation: search
@@ -487,8 +534,9 @@ receivers:
       type: service
       service:
         default:
-          startAfter: 0s
-          duration: 1s
+          duration:
+            for: "0.8"
+            as: relative
           failWith:
             probability: 0.2
         services:
@@ -500,7 +548,12 @@ receivers:
               - name: payment_request
                 id: ios_payment_request
                 kind: client
-                duration: 5000ms
+                delay:
+                  for: 0s
+                  as: absolute
+                duration:
+                  for: 1s
+                  as: absolute
 
           - name: payment_service
             resource:
@@ -508,14 +561,16 @@ receivers:
             tasks:
               - name: process_payment
                 kind: server
+                delay:
+                  for: "0.1"
+                  as: relative
                 childOf: ios_payment_request
-                startAfter: 50ms
-                duration: 3000ms
                 children:
                   - name: call_stripe_api
                     kind: client
-                    startAfter: 400ms
-                    duration: 1000ms
+                    delay:
+                      for: "0.1"
+                      as: relative
                     attributes:
                       http.url: https://api.stripe.com/v1/charges
                       payment.gateway: stripe

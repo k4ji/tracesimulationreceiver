@@ -124,6 +124,8 @@ receivers:
                   - name: produce_message_event
                     id: produce_message_event
                     kind: producer
+                    duration:
+                      for: "0.3"
                     failWith:
                       probability: 0.2
           - name: consumer
