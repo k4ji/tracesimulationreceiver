@@ -58,7 +58,8 @@ receivers:
             tasks:
               - name: consume_message_event
                 delay:
-                    for: 1s
+                  for: 1s
+                  as: absolute
                 duration:
                     for: 200ms
                     as: absolute
