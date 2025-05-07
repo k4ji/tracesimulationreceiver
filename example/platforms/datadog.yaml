@@ -71,6 +71,22 @@ receivers:
             tasks:
               - name: receive_write_request
                 kind: server
+                events:
+                  - name: request_received
+                    delay:
+                      for: 0s
+                      as: absolute
+                    attributes:
+                      http.method: POST
+                      http.target: /api/v1/messages
+                  - name: response_sent
+                    delay:
+                      for: "1.0"
+                      as: relative
+                    attributes:
+                      http.method: POST
+                      http.target: /api/v1/messages
+                      http.status_code: "200"
                 childOf: route_message_request
                 children:
                   - name: produce_message_kafka

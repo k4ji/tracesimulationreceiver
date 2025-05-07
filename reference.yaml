@@ -118,6 +118,30 @@ receivers:
                   ## Probability of the task failing (0.0 to 1.0).
                   probability: 1.0
                 kind: server
+                ## @param events - list of objects - optional
+                ## List of events associated with the task.
+                events:
+                  ## @param name - string - required
+                  ## Name of the event.
+                  - name: request_received
+                    ## @param delay - object - required
+                    ## Wait time before starting the event.
+                    delay:
+                      ## @param for - string - required
+                      ## Wait time in one of the following formats:
+                      ## - Duration: e.g., 1s, 2m (must be greater than or equal to 0).
+                      ## - Float: e.g., 0.5 (50% of the task duration, must be greater than or equal to 0).
+                      for: 0s
+                      ## @param as - string - required
+                      ## Type of delay. Can be one of:
+                      ## - 'absolute': Specifies a fixed delay.
+                      ## - 'relative': Specifies a delay relative to the task it belongs to..
+                      as: absolute
+                      ## @param attributes - map of key/value pairs - optional
+                      ## Attributes associated with the event (e.g., HTTP method, target).
+                    attributes:
+                      http.method: GET
+                      http.target: /api/v1/resource
                 ## @param children - list of objects - optional
                 ## List of child tasks that are executed after the parent task.
                 children:

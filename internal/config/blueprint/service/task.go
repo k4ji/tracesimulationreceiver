@@ -28,6 +28,9 @@ type Task struct {
 	// Children is a list of child tasks triggered by this task.
 	Children []Task `mapstructure:"children"`
 
+	// Events is a list of events associated with the task.
+	Events []Event `mapstructure:"events"`
+
 	// ChildOf is an optional parent task identifier.
 	ChildOf *string `mapstructure:"childOf"`
 
@@ -44,6 +47,7 @@ func (t *Task) To() (*model.Task, error) {
 	var parentID *domaintask.ExternalID
 	var linkedTo []*domaintask.ExternalID
 	var children []model.Task
+	var events []domaintask.Event
 	delay, err := t.Delay.To()
 	if err != nil {
 		return nil, err
@@ -83,6 +87,16 @@ func (t *Task) To() (*model.Task, error) {
 			children[i] = *c
 		}
 	}
+	if t.Events != nil {
+		events = make([]domaintask.Event, len(t.Events))
+		for i, event := range t.Events {
+			d, err := event.To()
+			if err != nil {
+				return nil, err
+			}
+			events[i] = *d
+		}
+	}
 	return &model.Task{
 		Name:                t.Name,
 		ExternalID:          externalID,
@@ -93,6 +107,7 @@ func (t *Task) To() (*model.Task, error) {
 		Children:            children,
 		ChildOf:             parentID,
 		LinkedTo:            linkedTo,
+		Events:              events,
 		FailWithProbability: *t.FailWith.Probability,
 	}, nil
 }

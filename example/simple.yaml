@@ -39,6 +39,22 @@ receivers:
                 failWith:
                   probability: 0.5
                 kind: server
+                events:
+                  - name: request_received
+                    delay:
+                      for: 0s
+                      as: absolute
+                    attributes:
+                      http.method: GET
+                      http.target: /api/v1/resource
+                  - name: response_sent
+                    delay:
+                      for: "1.0"
+                      as: relative
+                    attributes:
+                      http.method: GET
+                      http.target: /api/v1/resource
+                      http.status_code: "200"
                 children:
                   - name: produce_message_event
                     id: produce_message_event
@@ -61,8 +77,8 @@ receivers:
                   for: 1s
                   as: absolute
                 duration:
-                    for: 200ms
-                    as: absolute
+                  for: 200ms
+                  as: absolute
                 kind: consumer
                 attributes:
                   team: backend
