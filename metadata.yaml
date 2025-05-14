@@ -22,8 +22,6 @@ tests:
           duration:
             for: "0.8"
             as: relative
-          failWith:
-            probability: 0.5
         services:
           - name: client
             resource:
@@ -46,15 +44,11 @@ tests:
             tasks:
               - name: accept_request
                 childOf: send_request
-                failWith:
-                  probability: 1.0
                 kind: server
                 children:
                   - name: produce_message_event
                     id: produce_message_event
                     kind: producer
-                    failWith:
-                      probability: 0.2
           - name: consumer
             tasks:
               - name: consume_message_event

@@ -21,9 +21,6 @@ func TestValidate(t *testing.T) {
 					Mode:  ptrString("absolute"),
 				},
 				Duration: &duration,
-				FailWith: FailureCondition{
-					Probability: floatPtr(0.5),
-				},
 			},
 			Services: []Service{},
 		}
@@ -50,9 +47,6 @@ func TestValidate(t *testing.T) {
 								Value: ptrString("1000ms"),
 								Mode:  ptrString("absolute"),
 							},
-							FailWith: FailureCondition{
-								Probability: floatPtr(0.5),
-							},
 						},
 					},
 				},
@@ -74,9 +68,6 @@ func TestValidate(t *testing.T) {
 							Duration: &Duration{
 								Value: ptrString("1000"),
 								Mode:  ptrString("absolute"),
-							},
-							FailWith: FailureCondition{
-								Probability: floatPtr(0.5),
 							},
 						},
 					},
@@ -107,9 +98,6 @@ func TestValidate(t *testing.T) {
 								Mode:  ptrString("absolute"),
 							},
 							Kind: "client",
-							FailWith: FailureCondition{
-								Probability: floatPtr(0.5),
-							},
 						},
 					},
 				},
@@ -132,9 +120,6 @@ func TestValidate(t *testing.T) {
 								Mode:  ptrString("absolute"),
 							},
 							Kind: "client",
-							FailWith: FailureCondition{
-								Probability: floatPtr(0.5),
-							},
 						},
 					},
 				},
@@ -142,63 +127,6 @@ func TestValidate(t *testing.T) {
 		}
 		err := bp.Validate()
 		assert.EqualError(t, err, "task task1 must have a duration value or global default")
-	})
-
-	t.Run("missing failWith with default", func(t *testing.T) {
-		bp := &Blueprint{
-			Default: DefaultValues{
-				FailWith: FailureCondition{
-					Probability: floatPtr(0.5),
-				},
-			},
-			Services: []Service{
-				{
-					Name: "service1",
-					Tasks: []Task{
-						{
-							Name: "task1",
-							Delay: &Delay{
-								Value: ptrString("1000ms"),
-								Mode:  ptrString("absolute"),
-							},
-							Duration: &Duration{
-								Value: ptrString("1000ms"),
-								Mode:  ptrString("absolute"),
-							},
-							Kind: "client",
-						},
-					},
-				},
-			},
-		}
-		err := bp.Validate()
-		assert.NoError(t, err)
-	})
-
-	t.Run("missing failWith without default", func(t *testing.T) {
-		bp := &Blueprint{
-			Services: []Service{
-				{
-					Name: "service1",
-					Tasks: []Task{
-						{
-							Name: "task1",
-							Delay: &Delay{
-								Value: ptrString("1000ms"),
-								Mode:  ptrString("absolute"),
-							},
-							Duration: &Duration{
-								Value: ptrString("1000ms"),
-								Mode:  ptrString("absolute"),
-							},
-							Kind: "client",
-						},
-					},
-				},
-			},
-		}
-		err := bp.Validate()
-		assert.EqualError(t, err, "task task1 must have a FailWithProbability value or global default")
 	})
 
 	t.Run("invalid delay", func(t *testing.T) {
@@ -252,18 +180,6 @@ func TestValidate(t *testing.T) {
 		err := bp.Validate()
 		assert.EqualError(t, err, "task task1 has invalid duration: absolute duration must be greater than 0")
 	})
-
-	t.Run("invalid default failWith probability", func(t *testing.T) {
-		bp := &Blueprint{
-			Default: DefaultValues{
-				FailWith: FailureCondition{
-					Probability: floatPtr(1.5),
-				},
-			},
-		}
-		err := bp.Validate()
-		assert.EqualError(t, err, "global default failWith.probability value between 0.0 and 1.0")
-	})
 }
 
 func TestTo(t *testing.T) {
@@ -277,9 +193,6 @@ func TestTo(t *testing.T) {
 				Duration: &Duration{
 					Value: ptrString("200ns"),
 					Mode:  ptrString("absolute"),
-				},
-				FailWith: FailureCondition{
-					Probability: floatPtr(0.5),
 				},
 			},
 			Services: []Service{
@@ -316,13 +229,7 @@ func TestTo(t *testing.T) {
 									Attributes: map[string]string{
 										"key2": "value2",
 									},
-									FailWith: FailureCondition{
-										Probability: floatPtr(0.2),
-									},
 								},
-							},
-							FailWith: FailureCondition{
-								Probability: floatPtr(0.1),
 							},
 						},
 					},
@@ -348,36 +255,16 @@ func TestTo(t *testing.T) {
 										Mode:  ptrString("absolute"),
 									},
 									Kind: "producer",
-									FailWith: FailureCondition{
-										Probability: floatPtr(0.4),
-									},
-								},
-								// missing FailWith
-								{
-									Name:       "task2-child2",
-									ExternalID: ptrString("task2-child2"),
-									Delay: &Delay{
-										Value: ptrString("7ms"),
-										Mode:  ptrString("absolute"),
-									},
-									Duration: &Duration{
-										Value: ptrString("8ms"),
-										Mode:  ptrString("absolute"),
-									},
-									Kind: "producer",
 								},
 							},
 							ChildOf: ptrString("task1"),
-							FailWith: FailureCondition{
-								Probability: floatPtr(0.3),
-							},
 						},
 					},
 				},
 				{
 					Name: "service3",
 					Tasks: []Task{
-						// LinkedTo plus missing StartAfter, Value and FailWith
+						// LinkedTo plus missing StartAfter, Value
 						{
 							Name: "task3",
 							Kind: "consumer",
@@ -402,14 +289,12 @@ func TestTo(t *testing.T) {
 		assert.Equal(t, task.KindClient, task1.Definition().Kind())
 		assert.Equal(t, NewDelayAsAbsoluteDuration(1*time.Millisecond), task1.Definition().Delay())
 		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(2)*time.Millisecond), task1.Definition().Duration())
-		assert.Equal(t, 0.1, task1.Definition().FailWithProbability())
 
 		assert.Equal(t, "task1-child", task1.Children()[0].Definition().Name())
 		assert.Equal(t, "value2", task1.Children()[0].Definition().Attributes()["key2"])
 		assert.Equal(t, task.KindInternal, task1.Children()[0].Definition().Kind())
 		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(3)*time.Millisecond), task1.Children()[0].Definition().Delay())
 		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(4)*time.Millisecond), task1.Children()[0].Definition().Duration())
-		assert.Equal(t, 0.2, task1.Children()[0].Definition().FailWithProbability())
 
 		task2 := result[0].Children()[1]
 		assert.Equal(t, "task2", task2.Definition().Name())
@@ -417,25 +302,16 @@ func TestTo(t *testing.T) {
 		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(100)), task2.Definition().Delay())
 		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(5)*time.Millisecond), task2.Definition().Duration())
 		assert.Equal(t, "task1", task2.Definition().ChildOf().Value())
-		assert.Equal(t, 0.3, task2.Definition().FailWithProbability())
 
 		assert.Equal(t, "task2-child1", task2.Children()[0].Definition().Name())
 		assert.Equal(t, task.KindProducer, task2.Children()[0].Definition().Kind())
 		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(6)*time.Millisecond), task2.Children()[0].Definition().Delay())
 		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(200)), task2.Children()[0].Definition().Duration())
-		assert.Equal(t, 0.4, task2.Children()[0].Definition().FailWithProbability())
-
-		assert.Equal(t, "task2-child2", task2.Children()[1].Definition().Name())
-		assert.Equal(t, task.KindProducer, task2.Children()[1].Definition().Kind())
-		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(7)*time.Millisecond), task2.Children()[1].Definition().Delay())
-		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(8)*time.Millisecond), task2.Children()[1].Definition().Duration())
-		assert.Equal(t, 0.5, task2.Children()[1].Definition().FailWithProbability())
 
 		assert.Equal(t, "task3", result[1].Definition().Name())
 		assert.Equal(t, task.KindConsumer, result[1].Definition().Kind())
 		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(100)), result[1].Definition().Delay())
 		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(200)), result[1].Definition().Duration())
-		assert.Equal(t, 0.5, result[1].Definition().FailWithProbability())
 		assert.Equal(t, "task2-child1", result[1].Definition().LinkedTo()[0].Value())
 		assert.Equal(t, "task2-child2", result[1].Definition().LinkedTo()[1].Value())
 	})
@@ -450,9 +326,6 @@ func TestTo(t *testing.T) {
 				Duration: &Duration{
 					Value: ptrString("200ns"),
 					Mode:  ptrString("absolute"),
-				},
-				FailWith: FailureCondition{
-					Probability: floatPtr(0.5),
 				},
 			},
 			Services: []Service{
@@ -482,9 +355,6 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 					Duration: &Duration{
 						Value: ptrString("10ms"),
 						Mode:  ptrString("absolute"),
-					},
-					FailWith: FailureCondition{
-						Probability: floatPtr(0.0),
 					},
 				},
 				Services: []Service{
@@ -555,9 +425,6 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 				Duration: &Duration{
 					Value: ptrString("10ms"),
 					Mode:  ptrString("absolute"),
-				},
-				FailWith: FailureCondition{
-					Probability: floatPtr(0.0),
 				},
 			},
 			Services: []Service{
@@ -641,9 +508,6 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 				Duration: &Duration{
 					Value: ptrString("10ms"),
 					Mode:  ptrString("absolute"),
-				},
-				FailWith: FailureCondition{
-					Probability: floatPtr(0.0),
 				},
 			},
 			Services: []Service{
@@ -752,9 +616,6 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 					Value: ptrString("10ms"),
 					Mode:  ptrString("absolute"),
 				},
-				FailWith: FailureCondition{
-					Probability: floatPtr(0.0),
-				},
 			},
 			Services: []Service{
 				{
@@ -835,9 +696,6 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 				Duration: &Duration{
 					Value: ptrString("10ms"),
 					Mode:  ptrString("absolute"),
-				},
-				FailWith: FailureCondition{
-					Probability: floatPtr(0.0),
 				},
 			},
 			Services: []Service{
@@ -1020,9 +878,6 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 						Value: ptrString("10ms"),
 						Mode:  ptrString("absolute"),
 					},
-					FailWith: FailureCondition{
-						Probability: floatPtr(0.0),
-					},
 				},
 				Services: []Service{
 					{
@@ -1092,9 +947,6 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 				Delay: &Delay{
 					Value: ptrString("10ms"),
 					Mode:  ptrString("absolute"),
-				},
-				FailWith: FailureCondition{
-					Probability: floatPtr(0.0),
 				},
 			},
 			Services: []Service{
@@ -1178,9 +1030,6 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 				Delay: &Delay{
 					Value: ptrString("10ms"),
 					Mode:  ptrString("absolute"),
-				},
-				FailWith: FailureCondition{
-					Probability: floatPtr(0.0),
 				},
 			},
 			Services: []Service{
@@ -1289,9 +1138,6 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 					Value: ptrString("10ms"),
 					Mode:  ptrString("absolute"),
 				},
-				FailWith: FailureCondition{
-					Probability: floatPtr(0.0),
-				},
 			},
 			Services: []Service{
 				{
@@ -1372,9 +1218,6 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 				Delay: &Delay{
 					Value: ptrString("10ms"),
 					Mode:  ptrString("absolute"),
-				},
-				FailWith: FailureCondition{
-					Probability: floatPtr(0.0),
 				},
 			},
 			Services: []Service{

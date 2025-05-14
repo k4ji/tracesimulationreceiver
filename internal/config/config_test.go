@@ -31,9 +31,6 @@ func TestConfig_Validate(t *testing.T) {
 										Value: ptrString("200ms"),
 										Mode:  ptrString("absolute"),
 									},
-									FailWith: service.FailureCondition{
-										Probability: ptrFloat(0.5),
-									},
 								},
 							},
 						},
@@ -71,9 +68,6 @@ func TestConfig_Validate(t *testing.T) {
 						Duration: &service.Duration{
 							Value: ptrString("1ns"),
 							Mode:  ptrString("absolute"),
-						},
-						FailWith: service.FailureCondition{
-							Probability: ptrFloat(0.0),
 						},
 					},
 					Services: []service.Service{
@@ -128,9 +122,6 @@ func TestConfig_Validate(t *testing.T) {
 					Default: service.DefaultValues{
 						Delay:    nil,
 						Duration: nil,
-						FailWith: service.FailureCondition{
-							Probability: nil,
-						},
 					},
 					Services: []service.Service{
 						{
@@ -144,9 +135,6 @@ func TestConfig_Validate(t *testing.T) {
 									}, Duration: &service.Duration{
 										Value: ptrString("1ns"),
 										Mode:  ptrString("absolute"),
-									},
-									FailWith: service.FailureCondition{
-										Probability: ptrFloat(1.0),
 									},
 								},
 							},
@@ -178,17 +166,6 @@ func TestConfig_Validate(t *testing.T) {
 			err := cfg.Validate()
 			assert.Error(t, err)
 			assert.Contains(t, err.Error(), "duration must be greater than 0")
-		})
-
-		t.Run("invalid FailWithProbability", func(t *testing.T) {
-			cfg.Blueprint.ServiceBlueprint.Services[0].Tasks[0].Duration = &service.Duration{
-				Value: ptrString("200ms"),
-				Mode:  ptrString("absolute"),
-			}
-			cfg.Blueprint.ServiceBlueprint.Services[0].Tasks[0].FailWith.Probability = ptrFloat(1.5)
-			err := cfg.Validate()
-			assert.Error(t, err)
-			assert.Contains(t, err.Error(), "must have a FailWithProbability value between 0.0 and 1.0")
 		})
 	})
 }
