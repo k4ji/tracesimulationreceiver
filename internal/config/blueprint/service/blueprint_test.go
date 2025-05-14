@@ -1411,10 +1411,6 @@ func ptrString(s string) *string {
 	return &s
 }
 
-func floatPtr(f float64) *float64 {
-	return &f
-}
-
 func NewDelayAsAbsoluteDuration(td time.Duration) task.Delay {
 	ad, _ := taskduration.NewAbsoluteDuration(td)
 	d, _ := task.NewDelay(ad)
