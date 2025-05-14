@@ -12,8 +12,6 @@ receivers:
           duration:
             for: "0.8"
             as: relative
-          failWith:
-            probability: 0.1
         services:
           - name: ios_client
             resource:
@@ -29,8 +27,15 @@ receivers:
                 duration:
                   for: 2s
                   as: absolute
-                failWith:
-                  probability: 0.2
+                conditionalEffects:
+                  - condition:
+                      kind: probabilistic
+                      probabilistic:
+                        threshold: 0.2
+                    effects:
+                      - kind: markAsFailed
+                        markAsFailed:
+                          message: "Process failed"
 
           - name: api_gateway
             resource:
@@ -81,12 +86,39 @@ receivers:
                       http.target: /api/v1/messages
                   - name: response_sent
                     delay:
-                      for: "1.0"
+                      for: "0.95"
                       as: relative
                     attributes:
                       http.method: POST
                       http.target: /api/v1/messages
                       http.status_code: "200"
+                conditionalEffects:
+                  - condition:
+                      kind: probabilistic
+                      probabilistic:
+                        threshold: 0.2
+                    effects:
+                      - kind: markAsFailed
+                        markAsFailed:
+                          message: Rate limit exceeded
+                      - kind: annotate
+                        annotate:
+                          attributes:
+                            error.type: RateLimitExceededException
+                      - kind: recordEvent
+                        recordEvent:
+                          event:
+                            name: exception
+                            delay:
+                              for: "1.0"
+                              as: relative
+                            attributes:
+                              exception.message: rate limit exceeded
+                              exception.type: RateLimitExceededException
+                              exception.stacktrace: |
+                                com.example.api.RateLimitExceededException: Rate limit exceeded
+                                at com.example.api.MessageService.sendMessage(MessageService.java:123)
+                                at com.example.api
                 childOf: route_message_request
                 children:
                   - name: produce_message_kafka
@@ -232,8 +264,6 @@ receivers:
           duration:
             for: "0.8"
             as: relative
-          failWith:
-            probability: 0.0
         services:
           - name: ios_client
             resource:
@@ -327,8 +357,6 @@ receivers:
           duration:
             for: "0.8"
             as: relative
-          failWith:
-            probability: 0.2
         services:
           - name: ios_client
             resource:
@@ -402,8 +430,6 @@ receivers:
           duration:
             for: "0.8"
             as: relative
-          failWith:
-            probability: 0.0
         services:
           - name: ios_client
             resource:
@@ -419,8 +445,15 @@ receivers:
                 duration:
                   for: 500ms
                   as: absolute
-                failWith:
-                  probability: 0.8
+                conditionalEffects:
+                  - condition:
+                      kind: probabilistic
+                      probabilistic:
+                        threshold: 0.8
+                    effects:
+                      - kind: markAsFailed
+                        markAsFailed:
+                          message: Process failed
 
           - name: api_gateway
             resource:
@@ -479,8 +512,6 @@ receivers:
           duration:
             for: "0.8"
             as: relative
-          failWith:
-            probability: 0.01
         services:
           - name: ios_client
             resource:
@@ -496,8 +527,15 @@ receivers:
                 duration:
                   for: 500ms
                   as: absolute
-                failWith:
-                  probability: 0.8
+                conditionalEffects:
+                  - condition:
+                      kind: probabilistic
+                      probabilistic:
+                        threshold: 0.8
+                    effects:
+                      - kind: markAsFailed
+                        markAsFailed:
+                          message: Invalid input
 
           - name: api_gateway
             resource:
@@ -553,8 +591,6 @@ receivers:
           duration:
             for: "0.8"
             as: relative
-          failWith:
-            probability: 0.2
         services:
           - name: ios_client
             resource:

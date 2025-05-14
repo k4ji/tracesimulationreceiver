@@ -22,21 +22,12 @@ type DefaultValues struct {
 	// Duration specifies the default duration for tasks
 	Duration *Duration `mapstructure:"duration"`
 
-	// FailWith specifies the default failure conditions for tasks.
-	FailWith FailureCondition `mapstructure:"failWith"`
-}
-
-type FailureCondition struct {
-	// Probability specifies the probability of failure (0.0 to 1.0).
-	Probability *float64 `mapstructure:"probability"`
+	// ConditionalEffects specifies the default conditional effects for tasks.
+	ConditionalEffects []ConditionalEffect `mapstructure:"conditionalEffects"`
 }
 
 // Validate checks the configuration for errors.
 func (bp *Blueprint) Validate() error {
-	if bp.Default.FailWith.Probability != nil && (*bp.Default.FailWith.Probability < 0.0 || *bp.Default.FailWith.Probability > 1.0) {
-		return fmt.Errorf("global default failWith.probability value between 0.0 and 1.0")
-	}
-
 	taskIDs := make(map[string]struct{})
 	for _, s := range bp.Services {
 		for _, task := range s.Tasks {
@@ -60,15 +51,6 @@ func (bp *Blueprint) Validate() error {
 			}
 			if err := duration.ValidateAfterDefaults(); err != nil {
 				return fmt.Errorf("task %s has invalid duration: %w", task.Name, err)
-			}
-			if task.FailWith.Probability == nil {
-				if bp.Default.FailWith.Probability == nil {
-					return fmt.Errorf("task %s must have a FailWithProbability value or global default", task.Name)
-				}
-			} else {
-				if *task.FailWith.Probability < 0.0 || *task.FailWith.Probability > 1.0 {
-					return fmt.Errorf("task %s must have a FailWithProbability value between 0.0 and 1.0", task.Name)
-				}
 			}
 		}
 	}
@@ -97,9 +79,6 @@ func (bp *Blueprint) prepare() {
 		for _, task := range tasks {
 			task.Delay = task.Delay.WithDefault(bp.Default.Delay)
 			task.Duration = task.Duration.WithDefault(bp.Default.Duration)
-			if task.FailWith.Probability == nil {
-				task.FailWith.Probability = bp.Default.FailWith.Probability
-			}
 			childTasks := make([]*Task, len(task.Children))
 			for i := range task.Children {
 				childTasks[i] = &task.Children[i]
@@ -124,9 +103,6 @@ func Default() *Blueprint {
 		Default: DefaultValues{
 			Delay:    nil,
 			Duration: nil,
-			FailWith: FailureCondition{
-				Probability: nil,
-			},
 		},
 		Services: []Service{},
 	}

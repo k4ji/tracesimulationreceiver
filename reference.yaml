@@ -41,12 +41,6 @@ receivers:
             ## @param as - string - optional
             ## Type of duration. Can be 'absolute' or 'relative'.
             as: relative
-          ## @param failWith - object - optional
-          ## Default configuration for simulating task failures.
-          failWith:
-            ## @param failWithProbability - float - optional
-            ## Probability of the task failing (0.0 to 1.0).
-            probability: 0.5
         ## @param services - list of objects - required
         ## List of services, each representing a simulated application or system component.
         services:
@@ -111,12 +105,6 @@ receivers:
                 ## The id of the task that this task is a child of.
                 ## You can use this to create a parent-child relationship between tasks
                 childOf: send_request
-                ## @param failWith - object - optional if default.failWith is set
-                ## Configuration for simulating task failures.
-                failWith:
-                  ## @param failWithProbability - float - optional if default.failWith is set
-                  ## Probability of the task failing (0.0 to 1.0).
-                  probability: 1.0
                 kind: server
                 ## @param events - list of objects - optional
                 ## List of events associated with the task.
@@ -150,8 +138,6 @@ receivers:
                     kind: producer
                     duration:
                       for: "0.3"
-                    failWith:
-                      probability: 0.2
           - name: consumer
             tasks:
               - name: consume_message_event
@@ -166,6 +152,55 @@ receivers:
                 children:
                   - name: process_message_event
                     kind: internal
+                    ## @param conditionalEffects - list of objects - optional
+                    ## List of conditional effects that can be applied to the task.
+                    conditionalEffects:
+                      ## @param condition - object - required
+                      ## Condition that determines when the effects should be applied.
+                      - condition:
+                          ## @param type - string - required
+                          ## Type of condition. Currently, only 'probabilistic' is supported.
+                          kind: probabilistic
+                          ## @param probabilistic - object - required
+                          ## Probabilistic condition that determines the probability of the effects being applied.
+                          probabilistic:
+                            ## @param threshold - float - required
+                            ## Threshold for the condition. The effects will be applied if the random number is less than this threshold.
+                            threshold: 0.1
+                        ## @param effects - list of objects - required
+                        ## List of effects to be applied if the condition is met.
+                        effects:
+                          ## @param kind - string - required
+                          ## Type of effect. Can be 'markAsFailed', 'annotate', or 'recordEvent'.
+                          - kind: markAsFailed
+                            ## @param markAsFailed - object - required
+                            ## Effect that marks the task as failed, leading to a span with the status 'Error'.
+                            markAsFailed:
+                              ## @param message - string - required
+                              ## Message to be logged as `Status.message`.
+                              message: "Failed to process message event"
+                          - kind: annotate
+                            ## @param annotate - object - required
+                            ## Effect that adds an attribute to the span.
+                            annotate:
+                              ## @param attributes - map of key/value pairs - required
+                              ## Attributes to be added to the span.
+                              attributes:
+                                error.type: "ProcessingError"
+                          - kind: recordEvent
+                            ## @param recordEvent - object - required
+                            ## Effect that records an event in the span.
+                            recordEvent:
+                              ## @param event - object (same as the event in the task) - required
+                              ## Event to be recorded in the span.
+                              event:
+                                name: exception
+                                delay:
+                                  for: "1.0"
+                                  as: relative
+                                attributes:
+                                  exception.type: "ProcessingError"
+                                  exception.message: "Failed to process message event"
 
 exporters:
   debug:

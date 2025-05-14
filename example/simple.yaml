@@ -12,8 +12,6 @@ receivers:
           duration:
             for: "0.8"
             as: relative
-          failWith:
-            probability: 0.0
         services:
           - name: client
             resource:
@@ -36,8 +34,6 @@ receivers:
             tasks:
               - name: accept_request
                 childOf: send_request
-                failWith:
-                  probability: 0.5
                 kind: server
                 events:
                   - name: request_received
@@ -61,8 +57,6 @@ receivers:
                     kind: producer
                     duration:
                       for: "0.3"
-                    failWith:
-                      probability: 0.2
                     attributes:
                       team: backend
                       messaging.system: kafka
@@ -90,6 +84,19 @@ receivers:
                 children:
                   - name: process_message_event
                     kind: internal
+                    conditionalEffects:
+                      - condition:
+                          kind: probabilistic
+                          probabilistic:
+                            threshold: 0.2
+                        effects:
+                          - kind: markAsFailed
+                            markAsFailed:
+                              message: Invalid message
+                          - kind: annotate
+                            annotate:
+                              attributes:
+                                error.type: InternalError
 
 exporters:
   otlp/jaeger:

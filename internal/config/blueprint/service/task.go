@@ -37,8 +37,8 @@ type Task struct {
 	// LinkedTo is a list of task identifiers this task is linked to.
 	LinkedTo []*string `mapstructure:"linkedTo"`
 
-	// FailWith specifies failure conditions for tasks.
-	FailWith FailureCondition `mapstructure:"failWith"`
+	// ConditionalEffects specifies the effects that can occur based on certain conditions.
+	ConditionalEffects []ConditionalEffect `mapstructure:"conditionalEffects"`
 }
 
 // To return model.Task
@@ -97,17 +97,26 @@ func (t *Task) To() (*model.Task, error) {
 			events[i] = *d
 		}
 	}
+	var conditionalDefinitions []*domaintask.ConditionalDefinition
+	for _, effect := range t.ConditionalEffects {
+		def, err := effect.To()
+		if err != nil {
+			return nil, err
+		}
+		conditionalDefinitions = append(conditionalDefinitions, def)
+	}
+
 	return &model.Task{
-		Name:                t.Name,
-		ExternalID:          externalID,
-		Delay:               *delay,
-		Duration:            *duration,
-		Kind:                t.Kind,
-		Attributes:          t.Attributes,
-		Children:            children,
-		ChildOf:             parentID,
-		LinkedTo:            linkedTo,
-		Events:              events,
-		FailWithProbability: *t.FailWith.Probability,
+		Name:                  t.Name,
+		ExternalID:            externalID,
+		Delay:                 *delay,
+		Duration:              *duration,
+		Kind:                  t.Kind,
+		Attributes:            t.Attributes,
+		Children:              children,
+		ChildOf:               parentID,
+		LinkedTo:              linkedTo,
+		Events:                events,
+		ConditionalDefinition: conditionalDefinitions,
 	}, nil
 }
