@@ -31,11 +31,11 @@ type Task struct {
 	// Events is a list of events associated with the task.
 	Events []Event `mapstructure:"events"`
 
-	// ChildOf is an optional parent task identifier.
-	ChildOf *string `mapstructure:"childOf"`
+	// Parent is an optional parent task identifier.
+	Parent *string `mapstructure:"parent"`
 
-	// LinkedTo is a list of task identifiers this task is linked to.
-	LinkedTo []*string `mapstructure:"linkedTo"`
+	// Links is a list of task identifiers this task is linked to.
+	Links []*string `mapstructure:"links"`
 
 	// ConditionalEffects specifies the effects that can occur based on certain conditions.
 	ConditionalEffects []ConditionalEffect `mapstructure:"conditionalEffects"`
@@ -45,7 +45,7 @@ type Task struct {
 func (t *Task) To() (*model.Task, error) {
 	var externalID *domaintask.ExternalID
 	var parentID *domaintask.ExternalID
-	var linkedTo []*domaintask.ExternalID
+	var links []*domaintask.ExternalID
 	var children []model.Task
 	var events []domaintask.Event
 	delay, err := t.Delay.To()
@@ -62,16 +62,16 @@ func (t *Task) To() (*model.Task, error) {
 			return nil, err
 		}
 	}
-	if t.ChildOf != nil {
-		parentID, err = domaintask.NewExternalID(*t.ChildOf)
+	if t.Parent != nil {
+		parentID, err = domaintask.NewExternalID(*t.Parent)
 		if err != nil {
 			return nil, err
 		}
 	}
-	if t.LinkedTo != nil {
-		linkedTo = make([]*domaintask.ExternalID, len(t.LinkedTo))
-		for j, link := range t.LinkedTo {
-			linkedTo[j], err = domaintask.NewExternalID(*link)
+	if t.Links != nil {
+		links = make([]*domaintask.ExternalID, len(t.Links))
+		for j, link := range t.Links {
+			links[j], err = domaintask.NewExternalID(*link)
 			if err != nil {
 				return nil, err
 			}
@@ -115,7 +115,7 @@ func (t *Task) To() (*model.Task, error) {
 		Attributes:            t.Attributes,
 		Children:              children,
 		ChildOf:               parentID,
-		LinkedTo:              linkedTo,
+		LinkedTo:              links,
 		Events:                events,
 		ConditionalDefinition: conditionalDefinitions,
 	}, nil

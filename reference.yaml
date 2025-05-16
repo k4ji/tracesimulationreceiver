@@ -101,10 +101,10 @@ receivers:
               service.version: 1.1.0
             tasks:
               - name: accept_request
-                ## @param childOf - string - optional
+                ## @param parent - string - optional
                 ## The id of the task that this task is a child of.
                 ## You can use this to create a parent-child relationship between tasks
-                childOf: send_request
+                parent: send_request
                 kind: server
                 ## @param events - list of objects - optional
                 ## List of events associated with the task.
@@ -145,9 +145,9 @@ receivers:
                   for: 200ms
                   as: absolute
                 kind: consumer
-                ## @param linkedTo - list of strings - optional
+                ## @param links - list of strings - optional
                 ## List of task ids that this task is linked to.
-                linkedTo:
+                links:
                   - produce_message_event
                 children:
                   - name: process_message_event

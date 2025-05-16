@@ -43,7 +43,7 @@ tests:
               service.version: 1.1.0
             tasks:
               - name: accept_request
-                childOf: send_request
+                parent: send_request
                 kind: server
                 children:
                   - name: produce_message_event
@@ -56,7 +56,7 @@ tests:
                   for: 200ms
                   as: absolute
                 kind: consumer
-                linkedTo:
+                links:
                   - produce_message_event
                 children:
                   - name: process_message_event

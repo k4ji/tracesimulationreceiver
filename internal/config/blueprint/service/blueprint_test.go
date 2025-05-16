@@ -238,7 +238,7 @@ func TestTo(t *testing.T) {
 					Name: "service2",
 					Tasks: []Task{
 						{
-							// childOf plus missing startAfter
+							// parent plus missing startAfter
 							Name: "task2",
 							Duration: &Duration{
 								Value: ptrString("5ms"),
@@ -257,18 +257,18 @@ func TestTo(t *testing.T) {
 									Kind: "producer",
 								},
 							},
-							ChildOf: ptrString("task1"),
+							Parent: ptrString("task1"),
 						},
 					},
 				},
 				{
 					Name: "service3",
 					Tasks: []Task{
-						// LinkedTo plus missing StartAfter, Value
+						// Links plus missing StartAfter, Value
 						{
 							Name: "task3",
 							Kind: "consumer",
-							LinkedTo: []*string{
+							Links: []*string{
 								ptrString("task2-child1"),
 								ptrString("task2-child2"),
 							},

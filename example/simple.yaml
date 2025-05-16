@@ -33,7 +33,7 @@ receivers:
               service.version: 1.1.0
             tasks:
               - name: accept_request
-                childOf: send_request
+                parent: send_request
                 kind: server
                 events:
                   - name: request_received
@@ -79,7 +79,7 @@ receivers:
                   messaging.system: kafka
                   messaging.destination: message-topic
                   messaging.operation: consume
-                linkedTo:
+                links:
                   - produce_message_event
                 children:
                   - name: process_message_event

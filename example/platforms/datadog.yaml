@@ -44,7 +44,7 @@ receivers:
               - name: receive_api_request
                 id: api_receive_api_request
                 kind: server
-                childOf: ios_send_message_request
+                parent: ios_send_message_request
                 children:
                   - name: call_auth_service
                     id: call_auth_service
@@ -65,7 +65,7 @@ receivers:
             tasks:
               - name: validate_user_session
                 kind: server
-                childOf: call_auth_service
+                parent: call_auth_service
                 attributes:
                   http.target: /api/v1/session/validate
                   http.method: GET
@@ -119,7 +119,7 @@ receivers:
                                 com.example.api.RateLimitExceededException: Rate limit exceeded
                                 at com.example.api.MessageService.sendMessage(MessageService.java:123)
                                 at com.example.api
-                childOf: route_message_request
+                parent: route_message_request
                 children:
                   - name: produce_message_kafka
                     id: produce_message_kafka
@@ -142,7 +142,7 @@ receivers:
                 duration:
                   for: 200ms
                   as: absolute
-                linkedTo: [ produce_message_kafka ]
+                links: [ produce_message_kafka ]
                 attributes:
                   messaging.system: kafka
                   messaging.destination: message-topic
@@ -180,7 +180,7 @@ receivers:
                 duration:
                   for: 800ms
                   as: absolute
-                linkedTo: [ produce_message_kafka ]
+                links: [ produce_message_kafka ]
                 attributes:
                   messaging.system: kafka
                   messaging.destination: message-topic
@@ -217,7 +217,7 @@ receivers:
                 duration:
                   for: 1s
                   as: absolute
-                linkedTo: [ trigger_notification_event-1, trigger_notification_event-2 ]
+                links: [ trigger_notification_event-1, trigger_notification_event-2 ]
                 attributes:
                   messaging.system: kafka
                   messaging.destination: notification-topic
@@ -239,7 +239,7 @@ receivers:
                 duration:
                   for: 500ms
                   as: absolute
-                linkedTo: [ produce_message_kafka ]
+                links: [ produce_message_kafka ]
                 attributes:
                   messaging.system: kafka
                   messaging.destination: message-topic
@@ -286,7 +286,7 @@ receivers:
             tasks:
               - name: receive_read_request
                 kind: server
-                childOf: ios_read_message_request
+                parent: ios_read_message_request
                 children:
                   - name: call_auth_service_read
                     id: call_auth_service_read
@@ -307,7 +307,7 @@ receivers:
             tasks:
               - name: validate_user_session_read
                 kind: server
-                childOf: call_auth_service_read
+                parent: call_auth_service_read
                 attributes:
                   http.target: /api/v1/session/validate
                   http.method: GET
@@ -318,7 +318,7 @@ receivers:
             tasks:
               - name: receive_read_request_backend
                 kind: server
-                childOf: route_message_read
+                parent: route_message_read
                 children:
                   - name: redis_cache_lookup
                     kind: client
@@ -380,7 +380,7 @@ receivers:
               - name: receive_search_request
                 id: api_receive_search_request
                 kind: server
-                childOf: ios_search_message_request
+                parent: ios_search_message_request
                 children:
                   - name: call_auth_service_search
                     id: call_auth_service_search
@@ -401,7 +401,7 @@ receivers:
             tasks:
               - name: validate_user_session_search
                 kind: server
-                childOf: call_auth_service_search
+                parent: call_auth_service_search
                 attributes:
                   http.target: /api/v1/session/validate
                   http.method: GET
@@ -412,7 +412,7 @@ receivers:
             tasks:
               - name: perform_search
                 kind: server
-                childOf: route_search_request
+                parent: route_search_request
                 attributes:
                   db.system: elasticsearch
                   db.operation: search
@@ -462,7 +462,7 @@ receivers:
               - name: receive_search_request
                 id: api_receive_search_request
                 kind: server
-                childOf: ios_search_message_request
+                parent: ios_search_message_request
                 children:
                   - name: call_auth_service_search
                     id: call_auth_service_search
@@ -483,7 +483,7 @@ receivers:
             tasks:
               - name: validate_user_session_search
                 kind: server
-                childOf: call_auth_service_search
+                parent: call_auth_service_search
                 attributes:
                   http.target: /api/v1/session/validate
                   http.method: GET
@@ -494,7 +494,7 @@ receivers:
             tasks:
               - name: perform_search
                 kind: server
-                childOf: route_search_request
+                parent: route_search_request
                 attributes:
                   db.system: elasticsearch
                   db.operation: search
@@ -544,7 +544,7 @@ receivers:
               - name: receive_search_request
                 id: api_receive_search_request
                 kind: server
-                childOf: ios_search_message_request
+                parent: ios_search_message_request
                 children:
                   - name: call_auth_service_search
                     id: call_auth_service_search
@@ -565,7 +565,7 @@ receivers:
             tasks:
               - name: validate_user_session_search
                 kind: server
-                childOf: call_auth_service_search
+                parent: call_auth_service_search
                 attributes:
                   http.target: /api/v1/session/validate
                   http.method: GET
@@ -576,7 +576,7 @@ receivers:
             tasks:
               - name: perform_search
                 kind: server
-                childOf: route_search_request
+                parent: route_search_request
                 attributes:
                   db.system: elasticsearch
                   db.operation: search
@@ -616,7 +616,7 @@ receivers:
                 delay:
                   for: "0.1"
                   as: relative
-                childOf: ios_payment_request
+                parent: ios_payment_request
                 children:
                   - name: call_stripe_api
                     kind: client
