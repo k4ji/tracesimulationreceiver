@@ -20,8 +20,10 @@ It simulates traces based on configurable blueprints, enabling teams to replicat
 service interactions, span timing, span linking and error conditions—without instrumenting real services.
 
 The blueprint configuration is shown below.
-The `service` blueprint is service-based: each service can have multiple tasks, where each task is mapped to an OpenTelemetry span.
-This blueprint describes a trace that spans multiple services, simulating client-server-producer interactions with realistic delays and probabilistic failures (e.g., 20% chance of error injection).
+The `service` blueprint is service-based: each service can have multiple tasks, where each task is mapped to an
+OpenTelemetry span.
+This blueprint describes a trace that spans multiple services, simulating client-server-producer interactions with
+realistic delays and probabilistic failures (e.g., 20% chance of error injection).
 
 <details><summary>Click to expand the full blueprint example</summary>
 
@@ -131,6 +133,7 @@ receivers:
                       messaging.destination: message-topic
                       messaging.operation: publish
 ```
+
 </details>
 
 The configuration above produces a trace like the one shown below (visualized using Jaeger):
@@ -166,32 +169,25 @@ docker run --rm --name jaeger \
   -p 16686:16686 \
   -p 4317:4317 \
   -p 4318:4318 \
-  jaegertracing/all-in-one:latest
+  jaegertracing/all-in-one:1.69.0
 ```  
 
-2. Fetch the example configuration file (defines a basic simulation setup):
-
-```shell
-curl -O https://raw.githubusercontent.com/k4ji/tracesimulationreceiver/main/example/simple.yaml
-```
-
-3. Run the OpenTelemetry Collector with Trace Simulation Receiver:
+2. Run the OpenTelemetry Collector with Trace Simulation Receiver (example config files are included in the provided image):
 
 ```shell
 docker run --rm \
-  -v "$(pwd)/simple.yaml:/etc/otelcol/config.yaml" \
-  ghcr.io/k4ji/otelcol-tracesimulationreceiver:latest \
-  --config /etc/otelcol/config.yaml
+  ghcr.io/k4ji/otelcol-tracesimulationreceiver:v0.3.1 \
+  --config /etc/otelcol/example/simple.yaml
  ```
 
-4. View the traces in Jaeger UI
+3. View the traces in Jaeger UI
    Open http://localhost:16686 in your browser.
 
 You can also explore other simulation scenarios using the configurations in [`./example`](./example) as well.
 
-### Other Platforms
+### Building Locally
 
-1. Clone `otelcol-tracesimulationreceiver` repository to build the Docker image of the opentelemetry collector with the
+1. Clone [otelcol-tracesimulationreceiver](https://github.com/k4ji/otelcol-tracesimulationreceiver) repository to build the Docker image of the opentelemetry collector with the
    trace simulation receiver:
 
 ```shell
@@ -200,7 +196,26 @@ cd otel-tracesimulationreceiver
 ```
 
 2. Build the Docker image (from the root of the repository):
-3. Follow the same steps from the macOS/Linux section above, starting with Step 1 (Jaeger setup).
+
+```shell
+docker build -t your-image-name . 
+```
+
+3. Fetch the example configuration file (defines a basic simulation setup):
+
+```shell
+curl -O https://raw.githubusercontent.com/k4ji/tracesimulationreceiver/v0.3.1/example/simple.yaml
+```
+
+4. Follow the same steps from the macOS/Linux section above, starting with Step 1 (Jaeger setup), while passing the
+   sample configuration file to the OpenTelemetry Collector.
+
+```shell
+docker run --rm \
+  -v $(pwd)/simple.yaml:/etc/otelcol/simple.yaml \
+  your-image-name \
+  --config /etc/otelcol/simple.yaml
+```
 
 ---
 
