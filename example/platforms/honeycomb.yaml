@@ -1,0 +1,653 @@
+receivers:
+  tracesimulationreceiver/send_message_request:
+    global:
+      interval: 5s
+    blueprint:
+      type: service
+      service:
+        default:
+          delay:
+            for: "0.05"
+            as: relative
+          duration:
+            for: "0.8"
+            as: relative
+        services:
+          - name: ios_client
+            resource:
+              device.manufacturer: Apple
+              service.version: v3
+            tasks:
+              - name: send_message_request
+                id: ios_send_message_request
+                kind: client
+                delay:
+                  for: 0s
+                  as: absolute
+                duration:
+                  for: 2s
+                  as: absolute
+                conditionalEffects:
+                  - condition:
+                      kind: probabilistic
+                      probabilistic:
+                        threshold: 0.2
+                    effects:
+                      - kind: markAsFailed
+                        markAsFailed:
+                          message: "Process failed"
+
+          - name: api_gateway
+            resource:
+              service.version: v2
+            tasks:
+              - name: receive_api_request
+                id: api_receive_api_request
+                kind: server
+                parent: ios_send_message_request
+                children:
+                  - name: call_auth_service
+                    id: call_auth_service
+                    kind: client
+                    duration:
+                      for: "0.1"
+                  - name: route_message_request
+                    id: route_message_request
+                    kind: client
+                    delay:
+                      for: "0.3"
+                    duration:
+                      for: "0.5"
+
+          - name: auth_service
+            resource:
+              service.version: v4
+            tasks:
+              - name: validate_user_session
+                kind: server
+                parent: call_auth_service
+                attributes:
+                  http.target: /api/v1/session/validate
+                  http.method: GET
+
+          - name: message_write_server
+            resource:
+              service.version: v4
+            tasks:
+              - name: receive_write_request
+                kind: server
+                events:
+                  - name: request_received
+                    delay:
+                      for: 0s
+                      as: absolute
+                    attributes:
+                      http.method: POST
+                      http.target: /api/v1/messages
+                  - name: response_sent
+                    delay:
+                      for: "0.95"
+                      as: relative
+                    attributes:
+                      http.method: POST
+                      http.target: /api/v1/messages
+                      http.status_code: "200"
+                conditionalEffects:
+                  - condition:
+                      kind: probabilistic
+                      probabilistic:
+                        threshold: 0.2
+                    effects:
+                      - kind: markAsFailed
+                        markAsFailed:
+                          message: Rate limit exceeded
+                      - kind: annotate
+                        annotate:
+                          attributes:
+                            error.type: RateLimitExceededException
+                      - kind: recordEvent
+                        recordEvent:
+                          event:
+                            name: exception
+                            delay:
+                              for: "1.0"
+                              as: relative
+                            attributes:
+                              exception.message: rate limit exceeded
+                              exception.type: RateLimitExceededException
+                              exception.stacktrace: |
+                                com.example.api.RateLimitExceededException: Rate limit exceeded
+                                at com.example.api.MessageService.sendMessage(MessageService.java:123)
+                                at com.example.api
+                parent: route_message_request
+                children:
+                  - name: produce_message_kafka
+                    id: produce_message_kafka
+                    kind: producer
+                    attributes:
+                      messaging.system: kafka
+                      messaging.destination: message-topic
+                      messaging.operation: publish
+
+          - name: message_event_consumer
+            resource:
+              service.version: v2
+              service.instance.id: message-event-consumer-1
+            tasks:
+              - name: consume_kafka_message
+                kind: consumer
+                delay:
+                  for: 2s
+                  as: absolute
+                duration:
+                  for: 200ms
+                  as: absolute
+                links: [ produce_message_kafka ]
+                attributes:
+                  messaging.system: kafka
+                  messaging.destination: message-topic
+                children:
+                  - name: update_read_model
+                    kind: client
+                    duration:
+                      for: "0.1"
+                    attributes:
+                      db.operation: update_read_model
+                      db.system: postgres
+                      db.table: messages
+                  - name: trigger_notification_event
+                    id: trigger_notification_event-1
+                    kind: producer
+                    delay:
+                      for: "0.4"
+                    duration:
+                      for: "0.1"
+                    attributes:
+                      messaging.operation: publish
+                      messaging.system: kafka
+                      messaging.destination: notification-topic
+
+          - name: message_event_consumer
+            resource:
+              service.version: v2
+              service.instance.id: message-event-consumer-2
+            tasks:
+              - name: consume_kafka_message
+                kind: consumer
+                delay:
+                  for: 2s
+                  as: absolute
+                duration:
+                  for: 800ms
+                  as: absolute
+                links: [ produce_message_kafka ]
+                attributes:
+                  messaging.system: kafka
+                  messaging.destination: message-topic
+                children:
+                  - name: update_read_model
+                    kind: client
+                    duration:
+                      for: "0.1"
+                    attributes:
+                      db.operation: update_read_model
+                      db.system: postgres
+                      db.table: messages
+                  - name: trigger_notification_event
+                    id: trigger_notification_event-2
+                    kind: producer
+                    delay:
+                      for: "0.4"
+                    duration:
+                      for: "0.1"
+                    attributes:
+                      messaging.operation: publish
+                      messaging.system: kafka
+                      messaging.destination: notification-topic
+
+          - name: notification_service
+            resource:
+              service.version: v2
+            tasks:
+              - name: consume_notification
+                kind: consumer
+                delay:
+                  for: 3s
+                  as: absolute
+                duration:
+                  for: 1s
+                  as: absolute
+                links: [ trigger_notification_event-1, trigger_notification_event-2 ]
+                attributes:
+                  messaging.system: kafka
+                  messaging.destination: notification-topic
+                children:
+                  - name: send_email_notification
+                    kind: client
+                    attributes:
+                      messaging.system: email-service
+
+          - name: audit_service
+            resource:
+              service.version: v2
+            tasks:
+              - name: log_message_event
+                kind: consumer
+                delay:
+                  for: 2s
+                  as: absolute
+                duration:
+                  for: 500ms
+                  as: absolute
+                links: [ produce_message_kafka ]
+                attributes:
+                  messaging.system: kafka
+                  messaging.destination: message-topic
+                children:
+                  - name: archive_message_event
+                    kind: client
+                    attributes:
+                      rpc.service: S3
+                      aws.s3.bucket: message-archive
+                      aws.s3.key: str!! 2025-01-01
+
+  tracesimulationreceiver/read_message_request:
+    global:
+      interval: 2s
+    blueprint:
+      type: service
+      service:
+        default:
+          delay:
+            for: "0.05"
+            as: relative
+          duration:
+            for: "0.8"
+            as: relative
+        services:
+          - name: ios_client
+            resource:
+              device.manufacturer: Apple
+              service.version: v3
+            tasks:
+              - name: read_message
+                id: ios_read_message_request
+                kind: client
+                delay:
+                  for: 0s
+                  as: absolute
+                duration:
+                  for: 500ms
+                  as: absolute
+
+          - name: api_gateway
+            resource:
+              service.version: v2
+            tasks:
+              - name: receive_read_request
+                kind: server
+                parent: ios_read_message_request
+                children:
+                  - name: call_auth_service_read
+                    id: call_auth_service_read
+                    kind: client
+                    duration:
+                      for: "0.1"
+                  - name: route_message_read
+                    id: route_message_read
+                    kind: client
+                    delay:
+                      for: "0.3"
+                    duration:
+                      for: "0.3"
+
+          - name: auth_service
+            resource:
+              service.version: v4
+            tasks:
+              - name: validate_user_session_read
+                kind: server
+                parent: call_auth_service_read
+                attributes:
+                  http.target: /api/v1/session/validate
+                  http.method: GET
+
+          - name: message_read_server
+            resource:
+              service.version: v1.0.0
+            tasks:
+              - name: receive_read_request_backend
+                kind: server
+                parent: route_message_read
+                children:
+                  - name: redis_cache_lookup
+                    kind: client
+                    duration:
+                      for: "0.1"
+                    attributes:
+                      db.system: redis
+                      db.operation: get
+                  - name: fetch_message
+                    kind: client
+                    delay:
+                      for: "0.2"
+                    duration:
+                      for: "0.2"
+                    attributes:
+                      db.system: postgres
+                      db.operation: select_enriched_message
+                      db.table: messages
+                  - name: send_read_response
+                    kind: server
+                    delay:
+                      for: "0.5"
+                    duration:
+                      for: "0.4"
+
+  tracesimulationreceiver/search_message_request_v1:
+    global:
+      interval: 15s
+    blueprint:
+      type: service
+      service:
+        default:
+          delay:
+            for: "0.05"
+            as: relative
+          duration:
+            for: "0.8"
+            as: relative
+        services:
+          - name: ios_client
+            resource:
+              device.manufacturer: Apple
+              service.version: v1
+            tasks:
+              - name: search_message_request
+                id: ios_search_message_request
+                kind: client
+                delay:
+                  for: 0s
+                  as: absolute
+                duration:
+                  for: 500ms
+                  as: absolute
+
+          - name: api_gateway
+            resource:
+              service.version: v2
+            tasks:
+              - name: receive_search_request
+                id: api_receive_search_request
+                kind: server
+                parent: ios_search_message_request
+                children:
+                  - name: call_auth_service_search
+                    id: call_auth_service_search
+                    kind: client
+                    duration:
+                      for: "0.1"
+                  - name: route_search_request
+                    id: route_search_request
+                    kind: client
+                    delay:
+                      for: "0.3"
+                    duration:
+                      for: "0.5"
+
+          - name: auth_service
+            resource:
+              service.version: v4
+            tasks:
+              - name: validate_user_session_search
+                kind: server
+                parent: call_auth_service_search
+                attributes:
+                  http.target: /api/v1/session/validate
+                  http.method: GET
+
+          - name: search_service
+            resource:
+              service.version: v2
+            tasks:
+              - name: perform_search
+                kind: server
+                parent: route_search_request
+                attributes:
+                  db.system: elasticsearch
+                  db.operation: search
+
+  tracesimulationreceiver/search_message_request_v2:
+    global:
+      interval: 10s
+    blueprint:
+      type: service
+      service:
+        default:
+          delay:
+            for: "0.05"
+            as: relative
+          duration:
+            for: "0.8"
+            as: relative
+        services:
+          - name: ios_client
+            resource:
+              device.manufacturer: Apple
+              service.version: v2
+            tasks:
+              - name: search_message_request
+                id: ios_search_message_request
+                kind: client
+                delay:
+                  for: 0s
+                  as: absolute
+                duration:
+                  for: 500ms
+                  as: absolute
+                conditionalEffects:
+                  - condition:
+                      kind: probabilistic
+                      probabilistic:
+                        threshold: 0.8
+                    effects:
+                      - kind: markAsFailed
+                        markAsFailed:
+                          message: Process failed
+
+          - name: api_gateway
+            resource:
+              service.version: v2
+            tasks:
+              - name: receive_search_request
+                id: api_receive_search_request
+                kind: server
+                parent: ios_search_message_request
+                children:
+                  - name: call_auth_service_search
+                    id: call_auth_service_search
+                    kind: client
+                    duration:
+                      for: "0.1"
+                  - name: route_search_request
+                    id: route_search_request
+                    kind: client
+                    delay:
+                      for: "0.3"
+                    duration:
+                      for: "0.5"
+
+          - name: auth_service
+            resource:
+              service.version: v4
+            tasks:
+              - name: validate_user_session_search
+                kind: server
+                parent: call_auth_service_search
+                attributes:
+                  http.target: /api/v1/session/validate
+                  http.method: GET
+
+          - name: search_service
+            resource:
+              service.version: v2
+            tasks:
+              - name: perform_search
+                kind: server
+                parent: route_search_request
+                attributes:
+                  db.system: elasticsearch
+                  db.operation: search
+
+  tracesimulationreceiver/search_message_request_v3:
+    global:
+      interval: 5s
+    blueprint:
+      type: service
+      service:
+        default:
+          delay:
+            for: "0.05"
+            as: relative
+          duration:
+            for: "0.8"
+            as: relative
+        services:
+          - name: ios_client
+            resource:
+              device.manufacturer: Apple
+              service.version: v3
+            tasks:
+              - name: search_message_request
+                id: ios_search_message_request
+                kind: client
+                delay:
+                  for: 0s
+                  as: absolute
+                duration:
+                  for: 500ms
+                  as: absolute
+                conditionalEffects:
+                  - condition:
+                      kind: probabilistic
+                      probabilistic:
+                        threshold: 0.8
+                    effects:
+                      - kind: markAsFailed
+                        markAsFailed:
+                          message: Invalid input
+
+          - name: api_gateway
+            resource:
+              service.version: v2
+            tasks:
+              - name: receive_search_request
+                id: api_receive_search_request
+                kind: server
+                parent: ios_search_message_request
+                children:
+                  - name: call_auth_service_search
+                    id: call_auth_service_search
+                    kind: client
+                    duration:
+                      for: "0.1"
+                  - name: route_search_request
+                    id: route_search_request
+                    kind: client
+                    delay:
+                      for: "0.3"
+                    duration:
+                      for: "0.5"
+
+          - name: auth_service
+            resource:
+              service.version: v4
+            tasks:
+              - name: validate_user_session_search
+                kind: server
+                parent: call_auth_service_search
+                attributes:
+                  http.target: /api/v1/session/validate
+                  http.method: GET
+
+          - name: search_service
+            resource:
+              service.version: v2
+            tasks:
+              - name: perform_search
+                kind: server
+                parent: route_search_request
+                attributes:
+                  db.system: elasticsearch
+                  db.operation: search
+
+  tracesimulationreceiver/payment_request:
+    global:
+      interval: 20s
+    blueprint:
+      type: service
+      service:
+        default:
+          duration:
+            for: "0.8"
+            as: relative
+        services:
+          - name: ios_client
+            resource:
+              device.manufacturer: Apple
+              service.version: v3
+            tasks:
+              - name: payment_request
+                id: ios_payment_request
+                kind: client
+                delay:
+                  for: 0s
+                  as: absolute
+                duration:
+                  for: 1s
+                  as: absolute
+
+          - name: payment_service
+            resource:
+              service.version: v2
+            tasks:
+              - name: process_payment
+                kind: server
+                delay:
+                  for: "0.1"
+                  as: relative
+                parent: ios_payment_request
+                children:
+                  - name: call_stripe_api
+                    kind: client
+                    delay:
+                      for: "0.1"
+                      as: relative
+                    attributes:
+                      http.url: https://api.stripe.com/v1/charges
+                      payment.gateway: stripe
+
+processors:
+  batch:
+  resource:
+    attributes:
+      - key: deployment.environment.name
+        value: demo
+        action: insert
+
+exporters:
+  otlp:
+    endpoint: "api.honeycomb.io:443"
+    headers:
+      # Set the Honeycomb API key as an environment variable before running the collector
+      "x-honeycomb-team": ${HONEYCOMB_API_KEY}
+
+service:
+  pipelines:
+    traces:
+      receivers: [ tracesimulationreceiver/send_message_request, tracesimulationreceiver/read_message_request, tracesimulationreceiver/payment_request, tracesimulationreceiver/search_message_request_v1, tracesimulationreceiver/search_message_request_v2, tracesimulationreceiver/search_message_request_v3 ]
+      processors: [ resource, batch ]
+      exporters: [ otlp ]
+  telemetry:
+    logs:
+      level: info
