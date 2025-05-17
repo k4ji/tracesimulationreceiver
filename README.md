@@ -17,7 +17,124 @@ The **Trace Simulation Receiver** generates synthetic trace data for testing, va
 OpenTelemetry-compatible pipelines.
 
 It simulates traces based on configurable blueprints, enabling teams to replicate distributed system behavior—including
-service interactions, span timing, and error conditions—without instrumenting real services.
+service interactions, span timing, span linking and error conditions—without instrumenting real services.
+
+The blueprint configuration is shown below.
+The `service` blueprint is service-based: each service can have multiple tasks, where each task is mapped to an OpenTelemetry span.
+This blueprint describes a trace that spans multiple services, simulating client-server-producer interactions with realistic delays and probabilistic failures (e.g., 20% chance of error injection).
+
+<details><summary>Click to expand the full blueprint example</summary>
+
+```yaml
+receivers:
+  tracesimulationreceiver:
+    global:
+      interval: 5s
+    blueprint:
+      type: service
+      service:
+        default:
+          delay:
+            for: "0.05"
+            as: relative
+          duration:
+            for: "0.8"
+            as: relative
+        services:
+          - name: ios_client
+            resource:
+              service.version: v3
+            tasks:
+              - name: send_message_request
+                id: ios_send_message_request
+                kind: client
+                delay:
+                  for: 0s
+                  as: absolute
+                duration:
+                  for: 2s
+                  as: absolute
+
+          - name: api_gateway
+            tasks:
+              - name: receive_api_request
+                id: api_receive_api_request
+                kind: server
+                parent: ios_send_message_request
+                children:
+                  - name: call_auth_service
+                    id: call_auth_service
+                    kind: client
+                    duration:
+                      for: "0.1"
+                  - name: route_message_request
+                    id: route_message_request
+                    kind: client
+                    delay:
+                      for: "0.3"
+                    duration:
+                      for: "0.5"
+
+          - name: auth_service
+            tasks:
+              - name: validate_user_session
+                kind: server
+                parent: call_auth_service
+
+          - name: message_write_server
+            tasks:
+              - name: receive_write_request
+                kind: server
+                events:
+                  - name: response_sent
+                    delay:
+                      for: "0.95"
+                      as: relative
+                    attributes:
+                      http.method: POST
+                      http.target: /api/v1/messages
+                      http.status_code: "200"
+                conditionalEffects:
+                  - condition:
+                      kind: probabilistic
+                      probabilistic:
+                        threshold: 0.2
+                    effects:
+                      - kind: markAsFailed
+                        markAsFailed:
+                          message: Rate limit exceeded
+                      - kind: annotate
+                        annotate:
+                          attributes:
+                            error.type: RateLimitExceededException
+                      - kind: recordEvent
+                        recordEvent:
+                          event:
+                            name: exception
+                            delay:
+                              for: "1.0"
+                              as: relative
+                            attributes:
+                              exception.message: rate limit exceeded
+                              exception.type: RateLimitExceededException
+                              exception.stacktrace: |
+                                com.example.api.RateLimitExceededException: Rate limit exceeded
+                                at com.example.api.MessageService.sendMessage(MessageService.java:123)
+                                at com.example.api
+                parent: route_message_request
+                children:
+                  - name: produce_message_kafka
+                    id: produce_message_kafka
+                    kind: producer
+                    attributes:
+                      messaging.system: kafka
+                      messaging.destination: message-topic
+                      messaging.operation: publish
+```
+</details>
+
+The configuration above produces a trace like the one shown below (visualized using Jaeger):
+![trace sample from jaeger](assets/trace_sample.png)
 
 --- 
 
