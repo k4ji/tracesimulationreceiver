@@ -192,7 +192,7 @@ You can also explore other simulation scenarios using the configurations in [`./
 
 ```shell
 git clone https://github.com/k4ji/otelcol-tracesimulationreceiver.git
-cd otel-tracesimulationreceiver
+cd otelcol-tracesimulationreceiver
 ```
 
 2. Build the Docker image (from the root of the repository):
@@ -201,21 +201,7 @@ cd otel-tracesimulationreceiver
 docker build -t your-image-name . 
 ```
 
-3. Fetch the example configuration file (defines a basic simulation setup):
-
-```shell
-curl -O https://raw.githubusercontent.com/k4ji/tracesimulationreceiver/v0.3.1/example/simple.yaml
-```
-
-4. Follow the same steps from the macOS/Linux section above, starting with Step 1 (Jaeger setup), while passing the
-   sample configuration file to the OpenTelemetry Collector.
-
-```shell
-docker run --rm \
-  -v $(pwd)/simple.yaml:/etc/otelcol/simple.yaml \
-  your-image-name \
-  --config /etc/otelcol/simple.yaml
-```
+3. Follow the same steps from the macOS/Linux section above, starting with Step 1 (Jaeger setup) with the image you built in Step 2.
 
 ---
 
