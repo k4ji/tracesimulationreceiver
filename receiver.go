@@ -30,27 +30,35 @@ func (r *traceSimReceiver) Start(ctx context.Context, _ component.Host) error {
 		ticker := time.NewTicker(r.interval)
 		defer ticker.Stop()
 
+		if err := r.emitTracesOnce(ctx); err != nil {
+			return
+		}
+
 		for {
 			select {
 			case <-ticker.C:
-				traces, err := r.simulator.Run(r.blueprint, time.Now())
-				if err != nil {
-					r.logger.Error("Error generating traces %v, shutting down receiver", zap.Error(err))
-					return
-				}
-				for _, trace := range traces {
-					err = r.nextConsumer.ConsumeTraces(ctx, trace)
-					if err != nil {
-						r.logger.Error("Error sending traces", zap.Error(err))
-						continue
-					}
-				}
+				_ = r.emitTracesOnce(ctx)
 			case <-ctx.Done():
 				return
 			}
 		}
 	}()
 
+	return nil
+}
+
+func (r *traceSimReceiver) emitTracesOnce(ctx context.Context) error {
+	traces, err := r.simulator.Run(r.blueprint, time.Now())
+	if err != nil {
+		r.logger.Error("Error generating traces", zap.Error(err))
+		return err
+	}
+	for _, trace := range traces {
+		err = r.nextConsumer.ConsumeTraces(ctx, trace)
+		if err != nil {
+			r.logger.Error("Error sending traces", zap.Error(err))
+		}
+	}
 	return nil
 }
 
