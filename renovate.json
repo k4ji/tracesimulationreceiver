@@ -11,6 +11,30 @@
     "config:recommended",
     "schedule:daily"
   ],
+  "regexManagers": [
+    {
+      "description": "Update GHCR Docker image version in README",
+      "fileMatch": [
+        "^README\\.md$"
+      ],
+      "matchStrings": [
+        "ghcr\\.io/k4ji/otelcol-tracesimulationreceiver:v(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "ghcr.io/k4ji/otelcol-tracesimulationreceiver",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "description": "Update Jaeger Docker image in README",
+      "fileMatch": [
+        "^README\\.md$"
+      ],
+      "matchStrings": [
+        "jaegertracing/all-in-one:(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "jaegertracing/all-in-one",
+      "datasourceTemplate": "docker"
+    }
+  ],
   "packageRules": [
     {
       "matchManagers": [
