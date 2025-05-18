@@ -138,13 +138,6 @@ receivers:
 The configuration above produces a trace like the one shown below (visualized using Jaeger):
 ![trace sample from jaeger](assets/trace_sample.png)
 
---- 
-
-## Configuration
-
-Refer to the [reference configuration](./reference.yaml) for detailed options, and see
-the [examples directory](./example) for real-world usage patterns.
-
 ---
 
 ## Use Cases
@@ -201,6 +194,13 @@ docker build -t your-image-name .
 ```
 
 3. Follow the same steps from the macOS/Linux section above, starting with Step 1 (Jaeger setup) with the image you built in Step 2.
+
+---
+
+## Configuration
+
+Refer to the [reference configuration](./reference.yaml) for detailed options, and see
+the [examples directory](./example) for real-world usage patterns.
 
 ---
 
