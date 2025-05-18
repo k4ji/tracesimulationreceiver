@@ -169,7 +169,7 @@ docker run --rm --name jaeger \
 ```shell
 docker run --rm \
   ghcr.io/k4ji/otelcol-tracesimulationreceiver:v0.4.0 \
-  --config /etc/otelcol/example/simple.yaml
+  --config /etc/otelcol/example/complex.yaml
  ```
 
 3. View the traces in Jaeger UI
