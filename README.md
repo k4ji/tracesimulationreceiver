@@ -164,7 +164,8 @@ docker run --rm --name jaeger \
   jaegertracing/all-in-one:1.69.0
 ```  
 
-2. Run the OpenTelemetry Collector with Trace Simulation Receiver (example config files are included in the provided image):
+2. Run the OpenTelemetry Collector with Trace Simulation Receiver (example config files are included in the provided
+   image):
 
 ```shell
 docker run --rm \
@@ -179,7 +180,8 @@ You can also explore other simulation scenarios using the configurations in [`./
 
 ### Building Locally
 
-1. Clone [otelcol-tracesimulationreceiver](https://github.com/k4ji/otelcol-tracesimulationreceiver) repository to build the Docker image of the opentelemetry collector with the
+1. Clone [otelcol-tracesimulationreceiver](https://github.com/k4ji/otelcol-tracesimulationreceiver) repository to build
+   the Docker image of the opentelemetry collector with the
    trace simulation receiver:
 
 ```shell
@@ -193,7 +195,8 @@ cd otelcol-tracesimulationreceiver
 docker build -t your-image-name . 
 ```
 
-3. Follow the same steps from the macOS/Linux section above, starting with Step 1 (Jaeger setup) with the image you built in Step 2.
+3. Follow the same steps from the macOS/Linux section above, starting with Step 1 (Jaeger setup) with the image you
+   built in Step 2.
 
 ---
 
@@ -201,6 +204,16 @@ docker build -t your-image-name .
 
 Refer to the [reference configuration](./reference.yaml) for detailed options, and see
 the [examples directory](./example) for real-world usage patterns.
+
+---
+
+## Tutorials
+
+[docs/tutorial.md](./docs/tutorial.md) helps you quickly get started with the `TraceSimulationReceiver` by walking through how to generate synthetic traces using features like:
+- Interval control
+- Span timing and relationships
+- Attributes and events
+- Conditional effects for failures and annotations
 
 ---
 

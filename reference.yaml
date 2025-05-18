@@ -52,7 +52,7 @@ receivers:
             resource:
               os: android
             ## @param spans - list of objects - required
-            ## Spans performed by the service, each representing a span.
+            ## Spans performed by the service, each representing a root span unless parent is specified.
             spans:
               ## @param name - string - required
               ## Name of the span.
