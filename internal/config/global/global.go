@@ -7,7 +7,7 @@ import (
 
 const DefaultInterval = 5 * time.Second
 
-// Global defines global default settings for tasks and intervals.
+// Global defines global default settings for span definitions and intervals.
 type Global struct {
 	// Interval specifies the time interval at which traces are generated (e.g., "5s").
 	Interval time.Duration `mapstructure:"interval"`

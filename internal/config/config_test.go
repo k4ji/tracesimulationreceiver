@@ -19,10 +19,10 @@ func TestConfig_Validate(t *testing.T) {
 					Services: []service.Service{
 						{
 							Name: "service1",
-							Tasks: []service.Task{
+							SpanDefinitions: []service.SpanDefinition{
 								{
-									Name:       "task1",
-									ExternalID: ptrString("task1-id"),
+									Name:       "span1",
+									ExternalID: ptrString("span1-id"),
 									Delay: &service.Delay{
 										Value: ptrString("100ms"),
 										Mode:  ptrString("absolute"),
@@ -53,8 +53,8 @@ func TestConfig_Validate(t *testing.T) {
 		assert.Contains(t, err.Error(), "global interval must be greater than 0")
 	})
 
-	t.Run("duplicate task ids", func(t *testing.T) {
-		duplicateID := "task-id"
+	t.Run("duplicate span ids", func(t *testing.T) {
+		duplicateID := "span-id"
 		cfg := Config{
 			Global: global.Default(),
 			Blueprint: blueprint.Blueprint{
@@ -73,9 +73,9 @@ func TestConfig_Validate(t *testing.T) {
 					Services: []service.Service{
 						{
 							Name: "service1",
-							Tasks: []service.Task{
+							SpanDefinitions: []service.SpanDefinition{
 								{
-									Name:       "task1",
+									Name:       "span1",
 									ExternalID: &duplicateID,
 									Delay: &service.Delay{
 										Value: ptrString("0"),
@@ -90,9 +90,9 @@ func TestConfig_Validate(t *testing.T) {
 						},
 						{
 							Name: "service2",
-							Tasks: []service.Task{
+							SpanDefinitions: []service.SpanDefinition{
 								{
-									Name:       "task2",
+									Name:       "span2",
 									ExternalID: &duplicateID,
 									Delay: &service.Delay{
 										Value: ptrString("0"),
@@ -110,10 +110,10 @@ func TestConfig_Validate(t *testing.T) {
 			},
 		}
 		err := cfg.Validate()
-		assert.EqualError(t, err, "blueprint validation failed: service blueprint validation failed: duplicate task ID task-id found")
+		assert.EqualError(t, err, "blueprint validation failed: service blueprint validation failed: duplicate span ID span-id found")
 	})
 
-	t.Run("invalid task properties", func(t *testing.T) {
+	t.Run("invalid span properties", func(t *testing.T) {
 		cfg := Config{
 			Global: global.Default(),
 			Blueprint: blueprint.Blueprint{
@@ -126,9 +126,9 @@ func TestConfig_Validate(t *testing.T) {
 					Services: []service.Service{
 						{
 							Name: "service1",
-							Tasks: []service.Task{
+							SpanDefinitions: []service.SpanDefinition{
 								{
-									Name: "task1",
+									Name: "span1",
 									Delay: &service.Delay{
 										Value: ptrString("0"),
 										Mode:  ptrString("absolute"),
@@ -145,7 +145,7 @@ func TestConfig_Validate(t *testing.T) {
 		}
 
 		t.Run("invalid Delay", func(t *testing.T) {
-			cfg.Blueprint.ServiceBlueprint.Services[0].Tasks[0].Delay = &service.Delay{
+			cfg.Blueprint.ServiceBlueprint.Services[0].SpanDefinitions[0].Delay = &service.Delay{
 				Value: ptrString("-1ns"),
 				Mode:  ptrString("absolute"),
 			}
@@ -155,11 +155,11 @@ func TestConfig_Validate(t *testing.T) {
 		})
 
 		t.Run("invalid Duration", func(t *testing.T) {
-			cfg.Blueprint.ServiceBlueprint.Services[0].Tasks[0].Delay = &service.Delay{
+			cfg.Blueprint.ServiceBlueprint.Services[0].SpanDefinitions[0].Delay = &service.Delay{
 				Value: ptrString("100ms"),
 				Mode:  ptrString("absolute"),
 			}
-			cfg.Blueprint.ServiceBlueprint.Services[0].Tasks[0].Duration = &service.Duration{
+			cfg.Blueprint.ServiceBlueprint.Services[0].SpanDefinitions[0].Duration = &service.Duration{
 				Value: ptrString("0"),
 				Mode:  ptrString("absolute"),
 			}

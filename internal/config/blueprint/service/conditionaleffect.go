@@ -5,7 +5,7 @@ import (
 	"github.com/k4ji/tracesimulator/pkg/model/task"
 )
 
-// ConditionalEffect represents a conditional effect that can be applied to a task.
+// ConditionalEffect represents a conditional effect that can be applied to a span.
 type ConditionalEffect struct {
 	// Condition is the condition that must be met for the effect to be applied.
 	Condition Condition `mapstructure:"condition"`

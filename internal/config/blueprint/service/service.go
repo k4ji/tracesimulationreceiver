@@ -10,15 +10,15 @@ type Service struct {
 	// Resource contains metadata or attributes associated with the service.
 	Resource map[string]string `mapstructure:"resource"`
 
-	// Tasks is a list of tasks associated with the service.
-	Tasks []Task `mapstructure:"tasks"`
+	// SpanDefinitions is a list of span definitions associated with the service.
+	SpanDefinitions []SpanDefinition `mapstructure:"spans"`
 }
 
 // To converts the service to a domain model.
 func (s *Service) To() (*model.Service, error) {
-	tasks := make([]model.Task, 0, len(s.Tasks))
-	for _, task := range s.Tasks {
-		t, err := task.To()
+	tasks := make([]model.Task, 0, len(s.SpanDefinitions))
+	for _, sd := range s.SpanDefinitions {
+		t, err := sd.To()
 		if err != nil {
 			return nil, err
 		}

@@ -21,7 +21,7 @@ func (d *Duration) To() (*task.Duration, error) {
 	if err := d.ValidateAfterDefaults(); err != nil {
 		return nil, err
 	}
-	td := TaskDuration{
+	td := SpanDuration{
 		Duration: *d.Value,
 		Mode:     FromString(*d.Mode),
 	}

@@ -8,21 +8,21 @@ import (
 )
 
 type Blueprint struct {
-	// Default contains default values for task parameters.
+	// Default contains default values for span parameters.
 	Default DefaultValues `mapstructure:"default"`
 	// Services is a list of services to simulate.
 	Services []Service `mapstructure:"services"`
 }
 
-// DefaultValues defines default values for task parameters.
+// DefaultValues defines default values for span parameters.
 type DefaultValues struct {
-	// Delay specifies the default wait time for tasks
+	// Delay specifies the default wait time for spans
 	Delay *Delay `mapstructure:"delay"`
 
-	// Duration specifies the default duration for tasks
+	// Duration specifies the default duration for spans
 	Duration *Duration `mapstructure:"duration"`
 
-	// ConditionalEffects specifies the default conditional effects for tasks.
+	// ConditionalEffects specifies the default conditional effects for spans.
 	ConditionalEffects []ConditionalEffect `mapstructure:"conditionalEffects"`
 }
 
@@ -30,27 +30,27 @@ type DefaultValues struct {
 func (bp *Blueprint) Validate() error {
 	taskIDs := make(map[string]struct{})
 	for _, s := range bp.Services {
-		for _, task := range s.Tasks {
-			if task.ExternalID != nil {
-				if _, exists := taskIDs[*task.ExternalID]; exists {
-					return fmt.Errorf("duplicate task ID %s found", *task.ExternalID)
+		for _, sd := range s.SpanDefinitions {
+			if sd.ExternalID != nil {
+				if _, exists := taskIDs[*sd.ExternalID]; exists {
+					return fmt.Errorf("duplicate span ID %s found", *sd.ExternalID)
 				} else {
-					taskIDs[*task.ExternalID] = struct{}{}
+					taskIDs[*sd.ExternalID] = struct{}{}
 				}
 			}
-			delay := task.Delay.WithDefault(bp.Default.Delay)
+			delay := sd.Delay.WithDefault(bp.Default.Delay)
 			if delay == nil {
-				return fmt.Errorf("task %s must have a delay value or global default", task.Name)
+				return fmt.Errorf("span %s must have a delay value or global default", sd.Name)
 			}
 			if err := delay.ValidateAfterDefaults(); err != nil {
-				return fmt.Errorf("task %s has invalid delay: %w", task.Name, err)
+				return fmt.Errorf("span %s has invalid delay: %w", sd.Name, err)
 			}
-			duration := task.Duration.WithDefault(bp.Default.Duration)
+			duration := sd.Duration.WithDefault(bp.Default.Duration)
 			if duration == nil {
-				return fmt.Errorf("task %s must have a duration value or global default", task.Name)
+				return fmt.Errorf("span %s must have a duration value or global default", sd.Name)
 			}
 			if err := duration.ValidateAfterDefaults(); err != nil {
-				return fmt.Errorf("task %s has invalid duration: %w", task.Name, err)
+				return fmt.Errorf("span %s has invalid duration: %w", sd.Name, err)
 			}
 		}
 	}
@@ -72,28 +72,28 @@ func (bp *Blueprint) To() (blueprint.Blueprint, error) {
 	return &sbp, nil
 }
 
-// sets default values for tasks if they are not specified.
+// sets default values for span definitions if they are not specified.
 func (bp *Blueprint) prepare() {
-	var applyDefaults func(tasks []*Task)
-	applyDefaults = func(tasks []*Task) {
-		for _, task := range tasks {
-			task.Delay = task.Delay.WithDefault(bp.Default.Delay)
-			task.Duration = task.Duration.WithDefault(bp.Default.Duration)
-			childTasks := make([]*Task, len(task.Children))
-			for i := range task.Children {
-				childTasks[i] = &task.Children[i]
+	var applyDefaults func(spanDefinitions []*SpanDefinition)
+	applyDefaults = func(spanDefinitions []*SpanDefinition) {
+		for _, sd := range spanDefinitions {
+			sd.Delay = sd.Delay.WithDefault(bp.Default.Delay)
+			sd.Duration = sd.Duration.WithDefault(bp.Default.Duration)
+			childSpans := make([]*SpanDefinition, len(sd.Children))
+			for i := range sd.Children {
+				childSpans[i] = &sd.Children[i]
 			}
-			applyDefaults(childTasks)
+			applyDefaults(childSpans)
 		}
 	}
 
-	// Apply defaults to all tasks in all services.
+	// Apply defaults to all span definitions in all services.
 	for i := range bp.Services {
-		tasks := make([]*Task, len(bp.Services[i].Tasks))
-		for j := range bp.Services[i].Tasks {
-			tasks[j] = &bp.Services[i].Tasks[j]
+		sds := make([]*SpanDefinition, len(bp.Services[i].SpanDefinitions))
+		for j := range bp.Services[i].SpanDefinitions {
+			sds[j] = &bp.Services[i].SpanDefinitions[j]
 		}
-		applyDefaults(tasks)
+		applyDefaults(sds)
 	}
 }
 

@@ -39,9 +39,9 @@ func TestValidate(t *testing.T) {
 			Services: []Service{
 				{
 					Name: "service1",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
-							Name: "task1",
+							Name: "span1",
 							Kind: "client",
 							Duration: &Duration{
 								Value: ptrString("1000ms"),
@@ -61,9 +61,9 @@ func TestValidate(t *testing.T) {
 			Services: []Service{
 				{
 					Name: "service1",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
-							Name: "task1",
+							Name: "span1",
 							Kind: "client",
 							Duration: &Duration{
 								Value: ptrString("1000"),
@@ -75,7 +75,7 @@ func TestValidate(t *testing.T) {
 			},
 		}
 		err := bp.Validate()
-		assert.EqualError(t, err, "task task1 must have a delay value or global default")
+		assert.EqualError(t, err, "span span1 must have a delay value or global default")
 	})
 
 	t.Run("missing duration with default", func(t *testing.T) {
@@ -90,9 +90,9 @@ func TestValidate(t *testing.T) {
 			Services: []Service{
 				{
 					Name: "service1",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
-							Name: "task1",
+							Name: "span1",
 							Delay: &Delay{
 								Value: ptrString("1000ms"),
 								Mode:  ptrString("absolute"),
@@ -112,9 +112,9 @@ func TestValidate(t *testing.T) {
 			Services: []Service{
 				{
 					Name: "service1",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
-							Name: "task1",
+							Name: "span1",
 							Delay: &Delay{
 								Value: ptrString("1000ms"),
 								Mode:  ptrString("absolute"),
@@ -126,7 +126,7 @@ func TestValidate(t *testing.T) {
 			},
 		}
 		err := bp.Validate()
-		assert.EqualError(t, err, "task task1 must have a duration value or global default")
+		assert.EqualError(t, err, "span span1 must have a duration value or global default")
 	})
 
 	t.Run("invalid delay", func(t *testing.T) {
@@ -140,9 +140,9 @@ func TestValidate(t *testing.T) {
 			Services: []Service{
 				{
 					Name: "service1",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
-							Name: "task1",
+							Name: "span1",
 							Kind: "client",
 						},
 					},
@@ -165,9 +165,9 @@ func TestValidate(t *testing.T) {
 			Services: []Service{
 				{
 					Name: "service1",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
-							Name: "task1",
+							Name: "span1",
 							Delay: &Delay{
 								Value: ptrString("1000ms"),
 								Mode:  ptrString("absolute"),
@@ -178,7 +178,7 @@ func TestValidate(t *testing.T) {
 			},
 		}
 		err := bp.Validate()
-		assert.EqualError(t, err, "task task1 has invalid duration: absolute duration must be greater than 0")
+		assert.EqualError(t, err, "span span1 has invalid duration: absolute duration must be greater than 0")
 	})
 }
 
@@ -198,10 +198,10 @@ func TestTo(t *testing.T) {
 			Services: []Service{
 				{
 					Name: "service1",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
-							Name:       "task1",
-							ExternalID: ptrString("task1"),
+							Name:       "span1",
+							ExternalID: ptrString("span1"),
 							Delay: &Delay{
 								Value: ptrString("1ms"),
 								Mode:  ptrString("absolute"),
@@ -214,9 +214,9 @@ func TestTo(t *testing.T) {
 							Attributes: map[string]string{
 								"key1": "value1",
 							},
-							Children: []Task{
+							Children: []SpanDefinition{
 								{
-									Name: "task1-child",
+									Name: "span1-child",
 									Delay: &Delay{
 										Value: ptrString("3ms"),
 										Mode:  ptrString("absolute"),
@@ -236,20 +236,20 @@ func TestTo(t *testing.T) {
 				},
 				{
 					Name: "service2",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
 							// parent plus missing startAfter
-							Name: "task2",
+							Name: "span2",
 							Duration: &Duration{
 								Value: ptrString("5ms"),
 								Mode:  ptrString("absolute"),
 							},
 							Kind: "server",
-							Children: []Task{
+							Children: []SpanDefinition{
 								// missing Value
 								{
-									Name:       "task2-child1",
-									ExternalID: ptrString("task2-child1"),
+									Name:       "span2-child1",
+									ExternalID: ptrString("span2-child1"),
 									Delay: &Delay{
 										Value: ptrString("6ms"),
 										Mode:  ptrString("absolute"),
@@ -257,20 +257,20 @@ func TestTo(t *testing.T) {
 									Kind: "producer",
 								},
 							},
-							Parent: ptrString("task1"),
+							Parent: ptrString("span1"),
 						},
 					},
 				},
 				{
 					Name: "service3",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						// Links plus missing StartAfter, Value
 						{
-							Name: "task3",
+							Name: "span3",
 							Kind: "consumer",
 							Links: []*string{
-								ptrString("task2-child1"),
-								ptrString("task2-child2"),
+								ptrString("span2-child1"),
+								ptrString("span2-child2"),
 							},
 						},
 					},
@@ -282,41 +282,41 @@ func TestTo(t *testing.T) {
 		assert.NoError(t, err)
 		// compare all fields of the blueprint
 		assert.Len(t, result, 2)
-		// check the first task tree
-		task1 := result[0]
-		assert.Equal(t, "task1", task1.Definition().Name())
-		assert.Equal(t, "value1", task1.Definition().Attributes()["key1"])
-		assert.Equal(t, task.KindClient, task1.Definition().Kind())
-		assert.Equal(t, NewDelayAsAbsoluteDuration(1*time.Millisecond), task1.Definition().Delay())
-		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(2)*time.Millisecond), task1.Definition().Duration())
+		// check the first span tree
+		span1 := result[0]
+		assert.Equal(t, "span1", span1.Definition().Name())
+		assert.Equal(t, "value1", span1.Definition().Attributes()["key1"])
+		assert.Equal(t, task.KindClient, span1.Definition().Kind())
+		assert.Equal(t, NewDelayAsAbsoluteDuration(1*time.Millisecond), span1.Definition().Delay())
+		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(2)*time.Millisecond), span1.Definition().Duration())
 
-		assert.Equal(t, "task1-child", task1.Children()[0].Definition().Name())
-		assert.Equal(t, "value2", task1.Children()[0].Definition().Attributes()["key2"])
-		assert.Equal(t, task.KindInternal, task1.Children()[0].Definition().Kind())
-		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(3)*time.Millisecond), task1.Children()[0].Definition().Delay())
-		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(4)*time.Millisecond), task1.Children()[0].Definition().Duration())
+		assert.Equal(t, "span1-child", span1.Children()[0].Definition().Name())
+		assert.Equal(t, "value2", span1.Children()[0].Definition().Attributes()["key2"])
+		assert.Equal(t, task.KindInternal, span1.Children()[0].Definition().Kind())
+		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(3)*time.Millisecond), span1.Children()[0].Definition().Delay())
+		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(4)*time.Millisecond), span1.Children()[0].Definition().Duration())
 
-		task2 := result[0].Children()[1]
-		assert.Equal(t, "task2", task2.Definition().Name())
-		assert.Equal(t, task.KindServer, task2.Definition().Kind())
-		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(100)), task2.Definition().Delay())
-		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(5)*time.Millisecond), task2.Definition().Duration())
-		assert.Equal(t, "task1", task2.Definition().ChildOf().Value())
+		span2 := result[0].Children()[1]
+		assert.Equal(t, "span2", span2.Definition().Name())
+		assert.Equal(t, task.KindServer, span2.Definition().Kind())
+		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(100)), span2.Definition().Delay())
+		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(5)*time.Millisecond), span2.Definition().Duration())
+		assert.Equal(t, "span1", span2.Definition().ChildOf().Value())
 
-		assert.Equal(t, "task2-child1", task2.Children()[0].Definition().Name())
-		assert.Equal(t, task.KindProducer, task2.Children()[0].Definition().Kind())
-		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(6)*time.Millisecond), task2.Children()[0].Definition().Delay())
-		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(200)), task2.Children()[0].Definition().Duration())
+		assert.Equal(t, "span2-child1", span2.Children()[0].Definition().Name())
+		assert.Equal(t, task.KindProducer, span2.Children()[0].Definition().Kind())
+		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(6)*time.Millisecond), span2.Children()[0].Definition().Delay())
+		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(200)), span2.Children()[0].Definition().Duration())
 
-		assert.Equal(t, "task3", result[1].Definition().Name())
+		assert.Equal(t, "span3", result[1].Definition().Name())
 		assert.Equal(t, task.KindConsumer, result[1].Definition().Kind())
 		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(100)), result[1].Definition().Delay())
 		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(200)), result[1].Definition().Duration())
-		assert.Equal(t, "task2-child1", result[1].Definition().LinkedTo()[0].Value())
-		assert.Equal(t, "task2-child2", result[1].Definition().LinkedTo()[1].Value())
+		assert.Equal(t, "span2-child1", result[1].Definition().LinkedTo()[0].Value())
+		assert.Equal(t, "span2-child2", result[1].Definition().LinkedTo()[1].Value())
 	})
 
-	t.Run("returns error for invalid task", func(t *testing.T) {
+	t.Run("returns error for invalid span", func(t *testing.T) {
 		bp := &Blueprint{
 			Default: DefaultValues{
 				Delay: &Delay{
@@ -331,9 +331,9 @@ func TestTo(t *testing.T) {
 			Services: []Service{
 				{
 					Name: "service1",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
-							Name:       "task1",
+							Name:       "span1",
 							ExternalID: ptrString("^invalid$"),
 							Kind:       "client",
 						},
@@ -360,7 +360,7 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 				Services: []Service{
 					{
 						Name: "service",
-						Tasks: []Task{
+						SpanDefinitions: []SpanDefinition{
 							{
 								Name: "root",
 								Delay: &Delay{
@@ -368,17 +368,17 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 									Mode:  ptrString("absolute"),
 								},
 								Kind: "internal",
-								Children: []Task{
+								Children: []SpanDefinition{
 									{
-										Name: "task-with-explicit-relative-duration-and-mode",
+										Name: "span-with-explicit-relative-duration-and-mode",
 										Delay: &Delay{
 											Value: ptrString("0.9"),
 											Mode:  ptrString("relative"),
 										},
 										Kind: "internal",
-										Children: []Task{
+										Children: []SpanDefinition{
 											{
-												Name: "task-with-explicit-absolute-duration-and-mode",
+												Name: "span-with-explicit-absolute-duration-and-mode",
 												Delay: &Delay{
 													Value: ptrString("8ms"),
 													Mode:  ptrString("absolute"),
@@ -398,20 +398,20 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 			assert.NoError(t, err)
 			// compare all fields of the blueprint
 			assert.Len(t, result, 1)
-			// check the first task tree
+			// check the first span tree
 			root := result[0]
 			assert.Equal(t, "root", root.Definition().Name())
 			assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(10)*time.Millisecond), root.Definition().Delay())
 
-			// check the first child task
-			task1 := root.Children()[0]
-			assert.Equal(t, "task-with-explicit-relative-duration-and-mode", task1.Definition().Name())
-			assert.Equal(t, NewDelayAsRelativeDuration(0.9), task1.Definition().Delay())
+			// check the first child span
+			span1 := root.Children()[0]
+			assert.Equal(t, "span-with-explicit-relative-duration-and-mode", span1.Definition().Name())
+			assert.Equal(t, NewDelayAsRelativeDuration(0.9), span1.Definition().Delay())
 
-			// check the second child task
-			task2 := task1.Children()[0]
-			assert.Equal(t, "task-with-explicit-absolute-duration-and-mode", task2.Definition().Name())
-			assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(8)*time.Millisecond), task2.Definition().Delay())
+			// check the second child span
+			span2 := span1.Children()[0]
+			assert.Equal(t, "span-with-explicit-absolute-duration-and-mode", span2.Definition().Name())
+			assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(8)*time.Millisecond), span2.Definition().Delay())
 		}
 	})
 
@@ -430,7 +430,7 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 			Services: []Service{
 				{
 					Name: "service",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
 							Name: "root",
 							Delay: &Delay{
@@ -438,25 +438,25 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 								Mode:  ptrString("absolute"),
 							},
 							Kind: "internal",
-							Children: []Task{
+							Children: []SpanDefinition{
 								{
-									Name: "task-with-explicit-relative-duration-and-mode",
+									Name: "span-with-explicit-relative-duration-and-mode",
 									Delay: &Delay{
 										Value: ptrString("0.9"),
 										Mode:  ptrString("relative"),
 									},
 									Kind: "internal",
-									Children: []Task{
+									Children: []SpanDefinition{
 										{
-											Name: "task-with-explicit-absolute-duration-and-mode",
+											Name: "span-with-explicit-absolute-duration-and-mode",
 											Delay: &Delay{
 												Value: ptrString("8ms"),
 												Mode:  ptrString("absolute"),
 											},
 											Kind: "internal",
-											Children: []Task{
+											Children: []SpanDefinition{
 												{
-													Name: "task-with-explicit-relative-duration",
+													Name: "span-with-explicit-relative-duration",
 													Delay: &Delay{
 														Value: ptrString("0.7"),
 													},
@@ -477,25 +477,25 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 		assert.NoError(t, err)
 		// compare all fields of the blueprint
 		assert.Len(t, result, 1)
-		// check the first task tree
+		// check the first span tree
 		root := result[0]
 		assert.Equal(t, "root", root.Definition().Name())
 		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(10)*time.Millisecond), root.Definition().Delay())
 
-		// check the first child task
-		task1 := root.Children()[0]
-		assert.Equal(t, "task-with-explicit-relative-duration-and-mode", task1.Definition().Name())
-		assert.Equal(t, NewDelayAsRelativeDuration(0.9), task1.Definition().Delay())
+		// check the first child span
+		span1 := root.Children()[0]
+		assert.Equal(t, "span-with-explicit-relative-duration-and-mode", span1.Definition().Name())
+		assert.Equal(t, NewDelayAsRelativeDuration(0.9), span1.Definition().Delay())
 
-		// check the second child task
-		task2 := task1.Children()[0]
-		assert.Equal(t, "task-with-explicit-absolute-duration-and-mode", task2.Definition().Name())
-		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(8)*time.Millisecond), task2.Definition().Delay())
+		// check the second child span
+		span2 := span1.Children()[0]
+		assert.Equal(t, "span-with-explicit-absolute-duration-and-mode", span2.Definition().Name())
+		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(8)*time.Millisecond), span2.Definition().Delay())
 
-		// check the child of the second child task
-		task3 := task2.Children()[0]
-		assert.Equal(t, "task-with-explicit-relative-duration", task3.Definition().Name())
-		assert.Equal(t, NewDelayAsRelativeDuration(0.7), task3.Definition().Delay())
+		// check the child of the second child span
+		span3 := span2.Children()[0]
+		assert.Equal(t, "span-with-explicit-relative-duration", span3.Definition().Name())
+		assert.Equal(t, NewDelayAsRelativeDuration(0.7), span3.Definition().Delay())
 	})
 
 	t.Run("with default delay of absolute mode", func(t *testing.T) {
@@ -513,7 +513,7 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 			Services: []Service{
 				{
 					Name: "service",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
 							Name: "root",
 							Delay: &Delay{
@@ -521,39 +521,39 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 								Mode:  ptrString("absolute"),
 							},
 							Kind: "internal",
-							Children: []Task{
+							Children: []SpanDefinition{
 								{
-									Name: "task-with-explicit-relative-duration-and-mode",
+									Name: "span-with-explicit-relative-duration-and-mode",
 									Delay: &Delay{
 										Value: ptrString("0.9"),
 										Mode:  ptrString("relative"),
 									},
 									Kind: "internal",
-									Children: []Task{
+									Children: []SpanDefinition{
 										{
-											Name: "task-with-explicit-absolute-duration-and-mode",
+											Name: "span-with-explicit-absolute-duration-and-mode",
 											Delay: &Delay{
 												Value: ptrString("8ms"),
 												Mode:  ptrString("absolute"),
 											},
 											Kind: "internal",
-											Children: []Task{
+											Children: []SpanDefinition{
 												{
-													Name: "task-with-explicit-absolute-duration",
+													Name: "span-with-explicit-absolute-duration",
 													Delay: &Delay{
 														Value: ptrString("7ms"),
 													},
 													Kind: "internal",
-													Children: []Task{
+													Children: []SpanDefinition{
 														{
-															Name: "task-with-explicit-absolute-mode",
+															Name: "span-with-explicit-absolute-mode",
 															Delay: &Delay{
 																Mode: ptrString("absolute"),
 															},
 															Kind: "internal",
-															Children: []Task{
+															Children: []SpanDefinition{
 																{
-																	Name: "task-without-explicit-duration",
+																	Name: "span-without-explicit-duration",
 																	Kind: "internal",
 																},
 															},
@@ -575,35 +575,35 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 		assert.NoError(t, err)
 		// compare all fields of the blueprint
 		assert.Len(t, result, 1)
-		// check the first task tree
+		// check the first span tree
 		root := result[0]
 		assert.Equal(t, "root", root.Definition().Name())
 		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(10)*time.Millisecond), root.Definition().Delay())
 
-		// check the first child task
-		task1 := root.Children()[0]
-		assert.Equal(t, "task-with-explicit-relative-duration-and-mode", task1.Definition().Name())
-		assert.Equal(t, NewDelayAsRelativeDuration(0.9), task1.Definition().Delay())
+		// check the first child span
+		span1 := root.Children()[0]
+		assert.Equal(t, "span-with-explicit-relative-duration-and-mode", span1.Definition().Name())
+		assert.Equal(t, NewDelayAsRelativeDuration(0.9), span1.Definition().Delay())
 
-		// check the second child task
-		task2 := task1.Children()[0]
-		assert.Equal(t, "task-with-explicit-absolute-duration-and-mode", task2.Definition().Name())
-		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(8)*time.Millisecond), task2.Definition().Delay())
+		// check the second child span
+		span2 := span1.Children()[0]
+		assert.Equal(t, "span-with-explicit-absolute-duration-and-mode", span2.Definition().Name())
+		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(8)*time.Millisecond), span2.Definition().Delay())
 
-		// check the child of the second child task
-		task3 := task2.Children()[0]
-		assert.Equal(t, "task-with-explicit-absolute-duration", task3.Definition().Name())
-		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(7)*time.Millisecond), task3.Definition().Delay())
+		// check the child of the second child span
+		span3 := span2.Children()[0]
+		assert.Equal(t, "span-with-explicit-absolute-duration", span3.Definition().Name())
+		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(7)*time.Millisecond), span3.Definition().Delay())
 
-		// check the child of the third child task
-		task4 := task3.Children()[0]
-		assert.Equal(t, "task-with-explicit-absolute-mode", task4.Definition().Name())
-		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(1)*time.Millisecond), task4.Definition().Delay())
+		// check the child of the third child span
+		span4 := span3.Children()[0]
+		assert.Equal(t, "span-with-explicit-absolute-mode", span4.Definition().Name())
+		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(1)*time.Millisecond), span4.Definition().Delay())
 
-		// check the child of the fourth child task
-		task5 := task4.Children()[0]
-		assert.Equal(t, "task-without-explicit-duration", task5.Definition().Name())
-		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(1)*time.Millisecond), task5.Definition().Delay())
+		// check the child of the fourth child span
+		span5 := span4.Children()[0]
+		assert.Equal(t, "span-without-explicit-duration", span5.Definition().Name())
+		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(1)*time.Millisecond), span5.Definition().Delay())
 	})
 
 	t.Run("with default delay of duration", func(t *testing.T) {
@@ -620,7 +620,7 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 			Services: []Service{
 				{
 					Name: "service",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
 							Name: "root",
 							Delay: &Delay{
@@ -628,25 +628,25 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 								Mode:  ptrString("absolute"),
 							},
 							Kind: "internal",
-							Children: []Task{
+							Children: []SpanDefinition{
 								{
-									Name: "task-with-explicit-relative-duration-and-mode",
+									Name: "span-with-explicit-relative-duration-and-mode",
 									Delay: &Delay{
 										Value: ptrString("0.9"),
 										Mode:  ptrString("relative"),
 									},
 									Kind: "internal",
-									Children: []Task{
+									Children: []SpanDefinition{
 										{
-											Name: "task-with-explicit-absolute-duration-and-mode",
+											Name: "span-with-explicit-absolute-duration-and-mode",
 											Delay: &Delay{
 												Value: ptrString("8ms"),
 												Mode:  ptrString("absolute"),
 											},
 											Kind: "internal",
-											Children: []Task{
+											Children: []SpanDefinition{
 												{
-													Name: "task-with-explicit-absolute-mode",
+													Name: "span-with-explicit-absolute-mode",
 													Delay: &Delay{
 														Mode: ptrString("absolute"),
 													},
@@ -666,25 +666,25 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 		assert.NoError(t, err)
 		// compare all fields of the blueprint
 		assert.Len(t, result, 1)
-		// check the first task tree
+		// check the first span tree
 		root := result[0]
 		assert.Equal(t, "root", root.Definition().Name())
 		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(10)*time.Millisecond), root.Definition().Delay())
 
-		// check the first child task
-		task1 := root.Children()[0]
-		assert.Equal(t, "task-with-explicit-relative-duration-and-mode", task1.Definition().Name())
-		assert.Equal(t, NewDelayAsRelativeDuration(0.9), task1.Definition().Delay())
+		// check the first child span
+		span1 := root.Children()[0]
+		assert.Equal(t, "span-with-explicit-relative-duration-and-mode", span1.Definition().Name())
+		assert.Equal(t, NewDelayAsRelativeDuration(0.9), span1.Definition().Delay())
 
-		// check the second child task
-		task2 := task1.Children()[0]
-		assert.Equal(t, "task-with-explicit-absolute-duration-and-mode", task2.Definition().Name())
-		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(8)*time.Millisecond), task2.Definition().Delay())
+		// check the second child span
+		span2 := span1.Children()[0]
+		assert.Equal(t, "span-with-explicit-absolute-duration-and-mode", span2.Definition().Name())
+		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(8)*time.Millisecond), span2.Definition().Delay())
 
-		// check the child of the second child task
-		task3 := task2.Children()[0]
-		assert.Equal(t, "task-with-explicit-absolute-mode", task3.Definition().Name())
-		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(1)*time.Millisecond), task3.Definition().Delay())
+		// check the child of the second child span
+		span3 := span2.Children()[0]
+		assert.Equal(t, "span-with-explicit-absolute-mode", span3.Definition().Name())
+		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(1)*time.Millisecond), span3.Definition().Delay())
 	})
 
 	t.Run("with default delay of mode", func(t *testing.T) {
@@ -701,7 +701,7 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 			Services: []Service{
 				{
 					Name: "service",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
 							Name: "root",
 							Delay: &Delay{
@@ -709,25 +709,25 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 								Mode:  ptrString("absolute"),
 							},
 							Kind: "internal",
-							Children: []Task{
+							Children: []SpanDefinition{
 								{
-									Name: "task-with-explicit-relative-duration-and-mode",
+									Name: "span-with-explicit-relative-duration-and-mode",
 									Delay: &Delay{
 										Value: ptrString("0.9"),
 										Mode:  ptrString("relative"),
 									},
 									Kind: "internal",
-									Children: []Task{
+									Children: []SpanDefinition{
 										{
-											Name: "task-with-explicit-absolute-duration-and-mode",
+											Name: "span-with-explicit-absolute-duration-and-mode",
 											Delay: &Delay{
 												Value: ptrString("8ms"),
 												Mode:  ptrString("absolute"),
 											},
 											Kind: "internal",
-											Children: []Task{
+											Children: []SpanDefinition{
 												{
-													Name: "task-with-explicit-absolute-duration",
+													Name: "span-with-explicit-absolute-duration",
 													Delay: &Delay{
 														Value: ptrString("7ms"),
 													},
@@ -748,25 +748,25 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 		assert.NoError(t, err)
 		// compare all fields of the blueprint
 		assert.Len(t, result, 1)
-		// check the first task tree
+		// check the first span tree
 		root := result[0]
 		assert.Equal(t, "root", root.Definition().Name())
 		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(10)*time.Millisecond), root.Definition().Delay())
 
-		// check the first child task
-		task1 := root.Children()[0]
-		assert.Equal(t, "task-with-explicit-relative-duration-and-mode", task1.Definition().Name())
-		assert.Equal(t, NewDelayAsRelativeDuration(0.9), task1.Definition().Delay())
+		// check the first child span
+		span1 := root.Children()[0]
+		assert.Equal(t, "span-with-explicit-relative-duration-and-mode", span1.Definition().Name())
+		assert.Equal(t, NewDelayAsRelativeDuration(0.9), span1.Definition().Delay())
 
-		// check the second child task
-		task2 := task1.Children()[0]
-		assert.Equal(t, "task-with-explicit-absolute-duration-and-mode", task2.Definition().Name())
-		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(8)*time.Millisecond), task2.Definition().Delay())
+		// check the second child span
+		span2 := span1.Children()[0]
+		assert.Equal(t, "span-with-explicit-absolute-duration-and-mode", span2.Definition().Name())
+		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(8)*time.Millisecond), span2.Definition().Delay())
 
-		// check the child of the second child task
-		task3 := task2.Children()[0]
-		assert.Equal(t, "task-with-explicit-absolute-duration", task3.Definition().Name())
-		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(7)*time.Millisecond), task3.Definition().Delay())
+		// check the child of the second child span
+		span3 := span2.Children()[0]
+		assert.Equal(t, "span-with-explicit-absolute-duration", span3.Definition().Name())
+		assert.Equal(t, NewDelayAsAbsoluteDuration(time.Duration(7)*time.Millisecond), span3.Definition().Delay())
 	})
 
 	t.Run("invalid combinations of delay duration and mode", func(t *testing.T) {
@@ -781,9 +781,9 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 					Services: []Service{
 						{
 							Name: "service",
-							Tasks: []Task{
+							SpanDefinitions: []SpanDefinition{
 								{
-									Name: "task1",
+									Name: "span1",
 									Delay: &Delay{
 										Value: ptrString("10ms"),
 										Mode:  ptrString("relative"),
@@ -802,9 +802,9 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 					Services: []Service{
 						{
 							Name: "service",
-							Tasks: []Task{
+							SpanDefinitions: []SpanDefinition{
 								{
-									Name: "task2",
+									Name: "span2",
 									Delay: &Delay{
 										Value: ptrString("0.5"),
 										Mode:  ptrString("absolute"),
@@ -823,9 +823,9 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 					Services: []Service{
 						{
 							Name: "service",
-							Tasks: []Task{
+							SpanDefinitions: []SpanDefinition{
 								{
-									Name: "task3",
+									Name: "span3",
 									Delay: &Delay{
 										Value: ptrString("10ms"),
 									},
@@ -843,9 +843,9 @@ func TestConvertConfigWithRelativeAndAbsoluteDelayModes(t *testing.T) {
 					Services: []Service{
 						{
 							Name: "service",
-							Tasks: []Task{
+							SpanDefinitions: []SpanDefinition{
 								{
-									Name: "task4",
+									Name: "span4",
 									Delay: &Delay{
 										Mode: ptrString("absolute"),
 									},
@@ -882,7 +882,7 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 				Services: []Service{
 					{
 						Name: "service",
-						Tasks: []Task{
+						SpanDefinitions: []SpanDefinition{
 							{
 								Name: "root",
 								Duration: &Duration{
@@ -890,17 +890,17 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 									Mode:  ptrString("absolute"),
 								},
 								Kind: "internal",
-								Children: []Task{
+								Children: []SpanDefinition{
 									{
-										Name: "task-with-explicit-relative-duration-and-mode",
+										Name: "span-with-explicit-relative-duration-and-mode",
 										Duration: &Duration{
 											Value: ptrString("0.9"),
 											Mode:  ptrString("relative"),
 										},
 										Kind: "internal",
-										Children: []Task{
+										Children: []SpanDefinition{
 											{
-												Name: "task-with-explicit-absolute-duration-and-mode",
+												Name: "span-with-explicit-absolute-duration-and-mode",
 												Duration: &Duration{
 													Value: ptrString("8ms"),
 													Mode:  ptrString("absolute"),
@@ -920,20 +920,20 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 			assert.NoError(t, err)
 			// compare all fields of the blueprint
 			assert.Len(t, result, 1)
-			// check the first task tree
+			// check the first span tree
 			root := result[0]
 			assert.Equal(t, "root", root.Definition().Name())
 			assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(10)*time.Millisecond), root.Definition().Duration())
 
-			// check the first child task
-			task1 := root.Children()[0]
-			assert.Equal(t, "task-with-explicit-relative-duration-and-mode", task1.Definition().Name())
-			assert.Equal(t, NewDurationAsRelativeDuration(0.9), task1.Definition().Duration())
+			// check the first child span
+			span1 := root.Children()[0]
+			assert.Equal(t, "span-with-explicit-relative-duration-and-mode", span1.Definition().Name())
+			assert.Equal(t, NewDurationAsRelativeDuration(0.9), span1.Definition().Duration())
 
-			// check the second child task
-			task2 := task1.Children()[0]
-			assert.Equal(t, "task-with-explicit-absolute-duration-and-mode", task2.Definition().Name())
-			assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(8)*time.Millisecond), task2.Definition().Duration())
+			// check the second child span
+			span2 := span1.Children()[0]
+			assert.Equal(t, "span-with-explicit-absolute-duration-and-mode", span2.Definition().Name())
+			assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(8)*time.Millisecond), span2.Definition().Duration())
 		}
 	})
 
@@ -952,7 +952,7 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 			Services: []Service{
 				{
 					Name: "service",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
 							Name: "root",
 							Duration: &Duration{
@@ -960,25 +960,25 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 								Mode:  ptrString("absolute"),
 							},
 							Kind: "internal",
-							Children: []Task{
+							Children: []SpanDefinition{
 								{
-									Name: "task-with-explicit-relative-duration-and-mode",
+									Name: "span-with-explicit-relative-duration-and-mode",
 									Duration: &Duration{
 										Value: ptrString("0.9"),
 										Mode:  ptrString("relative"),
 									},
 									Kind: "internal",
-									Children: []Task{
+									Children: []SpanDefinition{
 										{
-											Name: "task-with-explicit-absolute-duration-and-mode",
+											Name: "span-with-explicit-absolute-duration-and-mode",
 											Duration: &Duration{
 												Value: ptrString("8ms"),
 												Mode:  ptrString("absolute"),
 											},
 											Kind: "internal",
-											Children: []Task{
+											Children: []SpanDefinition{
 												{
-													Name: "task-with-explicit-relative-duration",
+													Name: "span-with-explicit-relative-duration",
 													Duration: &Duration{
 														Value: ptrString("0.7"),
 													},
@@ -999,25 +999,25 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 		assert.NoError(t, err)
 		// compare all fields of the blueprint
 		assert.Len(t, result, 1)
-		// check the first task tree
+		// check the first span tree
 		root := result[0]
 		assert.Equal(t, "root", root.Definition().Name())
 		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(10)*time.Millisecond), root.Definition().Duration())
 
-		// check the first child task
-		task1 := root.Children()[0]
-		assert.Equal(t, "task-with-explicit-relative-duration-and-mode", task1.Definition().Name())
-		assert.Equal(t, NewDurationAsRelativeDuration(0.9), task1.Definition().Duration())
+		// check the first child span
+		span1 := root.Children()[0]
+		assert.Equal(t, "span-with-explicit-relative-duration-and-mode", span1.Definition().Name())
+		assert.Equal(t, NewDurationAsRelativeDuration(0.9), span1.Definition().Duration())
 
-		// check the second child task
-		task2 := task1.Children()[0]
-		assert.Equal(t, "task-with-explicit-absolute-duration-and-mode", task2.Definition().Name())
-		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(8)*time.Millisecond), task2.Definition().Duration())
+		// check the second child span
+		span2 := span1.Children()[0]
+		assert.Equal(t, "span-with-explicit-absolute-duration-and-mode", span2.Definition().Name())
+		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(8)*time.Millisecond), span2.Definition().Duration())
 
-		// check the child of the second child task
-		task3 := task2.Children()[0]
-		assert.Equal(t, "task-with-explicit-relative-duration", task3.Definition().Name())
-		assert.Equal(t, NewDurationAsRelativeDuration(0.7), task3.Definition().Duration())
+		// check the child of the second child span
+		span3 := span2.Children()[0]
+		assert.Equal(t, "span-with-explicit-relative-duration", span3.Definition().Name())
+		assert.Equal(t, NewDurationAsRelativeDuration(0.7), span3.Definition().Duration())
 	})
 
 	t.Run("with default duration of absolute mode", func(t *testing.T) {
@@ -1035,7 +1035,7 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 			Services: []Service{
 				{
 					Name: "service",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
 							Name: "root",
 							Duration: &Duration{
@@ -1043,39 +1043,39 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 								Mode:  ptrString("absolute"),
 							},
 							Kind: "internal",
-							Children: []Task{
+							Children: []SpanDefinition{
 								{
-									Name: "task-with-explicit-relative-duration-and-mode",
+									Name: "span-with-explicit-relative-duration-and-mode",
 									Duration: &Duration{
 										Value: ptrString("0.9"),
 										Mode:  ptrString("relative"),
 									},
 									Kind: "internal",
-									Children: []Task{
+									Children: []SpanDefinition{
 										{
-											Name: "task-with-explicit-absolute-duration-and-mode",
+											Name: "span-with-explicit-absolute-duration-and-mode",
 											Duration: &Duration{
 												Value: ptrString("8ms"),
 												Mode:  ptrString("absolute"),
 											},
 											Kind: "internal",
-											Children: []Task{
+											Children: []SpanDefinition{
 												{
-													Name: "task-with-explicit-absolute-duration",
+													Name: "span-with-explicit-absolute-duration",
 													Duration: &Duration{
 														Value: ptrString("7ms"),
 													},
 													Kind: "internal",
-													Children: []Task{
+													Children: []SpanDefinition{
 														{
-															Name: "task-with-explicit-absolute-mode",
+															Name: "span-with-explicit-absolute-mode",
 															Duration: &Duration{
 																Mode: ptrString("absolute"),
 															},
 															Kind: "internal",
-															Children: []Task{
+															Children: []SpanDefinition{
 																{
-																	Name: "task-without-explicit-duration",
+																	Name: "span-without-explicit-duration",
 																	Kind: "internal",
 																},
 															},
@@ -1097,35 +1097,35 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 		assert.NoError(t, err)
 		// compare all fields of the blueprint
 		assert.Len(t, result, 1)
-		// check the first task tree
+		// check the first span tree
 		root := result[0]
 		assert.Equal(t, "root", root.Definition().Name())
 		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(10)*time.Millisecond), root.Definition().Duration())
 
-		// check the first child task
-		task1 := root.Children()[0]
-		assert.Equal(t, "task-with-explicit-relative-duration-and-mode", task1.Definition().Name())
-		assert.Equal(t, NewDurationAsRelativeDuration(0.9), task1.Definition().Duration())
+		// check the first child span
+		span1 := root.Children()[0]
+		assert.Equal(t, "span-with-explicit-relative-duration-and-mode", span1.Definition().Name())
+		assert.Equal(t, NewDurationAsRelativeDuration(0.9), span1.Definition().Duration())
 
-		// check the second child task
-		task2 := task1.Children()[0]
-		assert.Equal(t, "task-with-explicit-absolute-duration-and-mode", task2.Definition().Name())
-		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(8)*time.Millisecond), task2.Definition().Duration())
+		// check the second child span
+		span2 := span1.Children()[0]
+		assert.Equal(t, "span-with-explicit-absolute-duration-and-mode", span2.Definition().Name())
+		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(8)*time.Millisecond), span2.Definition().Duration())
 
-		// check the child of the second child task
-		task3 := task2.Children()[0]
-		assert.Equal(t, "task-with-explicit-absolute-duration", task3.Definition().Name())
-		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(7)*time.Millisecond), task3.Definition().Duration())
+		// check the child of the second child span
+		span3 := span2.Children()[0]
+		assert.Equal(t, "span-with-explicit-absolute-duration", span3.Definition().Name())
+		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(7)*time.Millisecond), span3.Definition().Duration())
 
-		// check the child of the third child task
-		task4 := task3.Children()[0]
-		assert.Equal(t, "task-with-explicit-absolute-mode", task4.Definition().Name())
-		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(1)*time.Millisecond), task4.Definition().Duration())
+		// check the child of the third child span
+		span4 := span3.Children()[0]
+		assert.Equal(t, "span-with-explicit-absolute-mode", span4.Definition().Name())
+		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(1)*time.Millisecond), span4.Definition().Duration())
 
-		// check the child of the fourth child task
-		task5 := task4.Children()[0]
-		assert.Equal(t, "task-without-explicit-duration", task5.Definition().Name())
-		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(1)*time.Millisecond), task5.Definition().Duration())
+		// check the child of the fourth child span
+		span5 := span4.Children()[0]
+		assert.Equal(t, "span-without-explicit-duration", span5.Definition().Name())
+		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(1)*time.Millisecond), span5.Definition().Duration())
 	})
 
 	t.Run("with default duration of duration", func(t *testing.T) {
@@ -1142,7 +1142,7 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 			Services: []Service{
 				{
 					Name: "service",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
 							Name: "root",
 							Duration: &Duration{
@@ -1150,25 +1150,25 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 								Mode:  ptrString("absolute"),
 							},
 							Kind: "internal",
-							Children: []Task{
+							Children: []SpanDefinition{
 								{
-									Name: "task-with-explicit-relative-duration-and-mode",
+									Name: "span-with-explicit-relative-duration-and-mode",
 									Duration: &Duration{
 										Value: ptrString("0.9"),
 										Mode:  ptrString("relative"),
 									},
 									Kind: "internal",
-									Children: []Task{
+									Children: []SpanDefinition{
 										{
-											Name: "task-with-explicit-absolute-duration-and-mode",
+											Name: "span-with-explicit-absolute-duration-and-mode",
 											Duration: &Duration{
 												Value: ptrString("8ms"),
 												Mode:  ptrString("absolute"),
 											},
 											Kind: "internal",
-											Children: []Task{
+											Children: []SpanDefinition{
 												{
-													Name: "task-with-explicit-absolute-mode",
+													Name: "span-with-explicit-absolute-mode",
 													Duration: &Duration{
 														Mode: ptrString("absolute"),
 													},
@@ -1188,25 +1188,25 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 		assert.NoError(t, err)
 		// compare all fields of the blueprint
 		assert.Len(t, result, 1)
-		// check the first task tree
+		// check the first span tree
 		root := result[0]
 		assert.Equal(t, "root", root.Definition().Name())
 		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(10)*time.Millisecond), root.Definition().Duration())
 
-		// check the first child task
-		task1 := root.Children()[0]
-		assert.Equal(t, "task-with-explicit-relative-duration-and-mode", task1.Definition().Name())
-		assert.Equal(t, NewDurationAsRelativeDuration(0.9), task1.Definition().Duration())
+		// check the first child span
+		span1 := root.Children()[0]
+		assert.Equal(t, "span-with-explicit-relative-duration-and-mode", span1.Definition().Name())
+		assert.Equal(t, NewDurationAsRelativeDuration(0.9), span1.Definition().Duration())
 
-		// check the second child task
-		task2 := task1.Children()[0]
-		assert.Equal(t, "task-with-explicit-absolute-duration-and-mode", task2.Definition().Name())
-		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(8)*time.Millisecond), task2.Definition().Duration())
+		// check the second child span
+		span2 := span1.Children()[0]
+		assert.Equal(t, "span-with-explicit-absolute-duration-and-mode", span2.Definition().Name())
+		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(8)*time.Millisecond), span2.Definition().Duration())
 
-		// check the child of the second child task
-		task3 := task2.Children()[0]
-		assert.Equal(t, "task-with-explicit-absolute-mode", task3.Definition().Name())
-		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(1)*time.Millisecond), task3.Definition().Duration())
+		// check the child of the second child span
+		span3 := span2.Children()[0]
+		assert.Equal(t, "span-with-explicit-absolute-mode", span3.Definition().Name())
+		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(1)*time.Millisecond), span3.Definition().Duration())
 	})
 
 	t.Run("with default duration of mode", func(t *testing.T) {
@@ -1223,7 +1223,7 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 			Services: []Service{
 				{
 					Name: "service",
-					Tasks: []Task{
+					SpanDefinitions: []SpanDefinition{
 						{
 							Name: "root",
 							Duration: &Duration{
@@ -1231,25 +1231,25 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 								Mode:  ptrString("absolute"),
 							},
 							Kind: "internal",
-							Children: []Task{
+							Children: []SpanDefinition{
 								{
-									Name: "task-with-explicit-relative-duration-and-mode",
+									Name: "span-with-explicit-relative-duration-and-mode",
 									Duration: &Duration{
 										Value: ptrString("0.9"),
 										Mode:  ptrString("relative"),
 									},
 									Kind: "internal",
-									Children: []Task{
+									Children: []SpanDefinition{
 										{
-											Name: "task-with-explicit-absolute-duration-and-mode",
+											Name: "span-with-explicit-absolute-duration-and-mode",
 											Duration: &Duration{
 												Value: ptrString("8ms"),
 												Mode:  ptrString("absolute"),
 											},
 											Kind: "internal",
-											Children: []Task{
+											Children: []SpanDefinition{
 												{
-													Name: "task-with-explicit-absolute-duration",
+													Name: "span-with-explicit-absolute-duration",
 													Duration: &Duration{
 														Value: ptrString("7ms"),
 													},
@@ -1270,25 +1270,25 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 		assert.NoError(t, err)
 		// compare all fields of the blueprint
 		assert.Len(t, result, 1)
-		// check the first task tree
+		// check the first span tree
 		root := result[0]
 		assert.Equal(t, "root", root.Definition().Name())
 		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(10)*time.Millisecond), root.Definition().Duration())
 
-		// check the first child task
-		task1 := root.Children()[0]
-		assert.Equal(t, "task-with-explicit-relative-duration-and-mode", task1.Definition().Name())
-		assert.Equal(t, NewDurationAsRelativeDuration(0.9), task1.Definition().Duration())
+		// check the first child span
+		span1 := root.Children()[0]
+		assert.Equal(t, "span-with-explicit-relative-duration-and-mode", span1.Definition().Name())
+		assert.Equal(t, NewDurationAsRelativeDuration(0.9), span1.Definition().Duration())
 
-		// check the second child task
-		task2 := task1.Children()[0]
-		assert.Equal(t, "task-with-explicit-absolute-duration-and-mode", task2.Definition().Name())
-		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(8)*time.Millisecond), task2.Definition().Duration())
+		// check the second child span
+		span2 := span1.Children()[0]
+		assert.Equal(t, "span-with-explicit-absolute-duration-and-mode", span2.Definition().Name())
+		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(8)*time.Millisecond), span2.Definition().Duration())
 
-		// check the child of the second child task
-		task3 := task2.Children()[0]
-		assert.Equal(t, "task-with-explicit-absolute-duration", task3.Definition().Name())
-		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(7)*time.Millisecond), task3.Definition().Duration())
+		// check the child of the second child span
+		span3 := span2.Children()[0]
+		assert.Equal(t, "span-with-explicit-absolute-duration", span3.Definition().Name())
+		assert.Equal(t, NewDurationAsAbsoluteDuration(time.Duration(7)*time.Millisecond), span3.Definition().Duration())
 	})
 
 	t.Run("invalid combinations of duration value and mode", func(t *testing.T) {
@@ -1303,9 +1303,9 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 					Services: []Service{
 						{
 							Name: "service",
-							Tasks: []Task{
+							SpanDefinitions: []SpanDefinition{
 								{
-									Name: "task1",
+									Name: "span1",
 									Delay: &Delay{
 										Value: ptrString("0"),
 										Mode:  ptrString("absolute"),
@@ -1328,9 +1328,9 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 					Services: []Service{
 						{
 							Name: "service",
-							Tasks: []Task{
+							SpanDefinitions: []SpanDefinition{
 								{
-									Name: "task2",
+									Name: "span2",
 									Delay: &Delay{
 										Value: ptrString("0"),
 										Mode:  ptrString("absolute"),
@@ -1353,9 +1353,9 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 					Services: []Service{
 						{
 							Name: "service",
-							Tasks: []Task{
+							SpanDefinitions: []SpanDefinition{
 								{
-									Name: "task3",
+									Name: "span3",
 									Delay: &Delay{
 										Value: ptrString("0"),
 										Mode:  ptrString("absolute"),
@@ -1377,9 +1377,9 @@ func TestConvertConfigWithRelativeAndAbsoluteDurationModes(t *testing.T) {
 					Services: []Service{
 						{
 							Name: "service",
-							Tasks: []Task{
+							SpanDefinitions: []SpanDefinition{
 								{
-									Name: "task4",
+									Name: "span4",
 									Delay: &Delay{
 										Value: ptrString("0"),
 										Mode:  ptrString("absolute"),

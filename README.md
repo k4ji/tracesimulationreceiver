@@ -20,8 +20,7 @@ It simulates traces based on configurable blueprints, enabling teams to replicat
 service interactions, span timing, span linking and error conditions—without instrumenting real services.
 
 The blueprint configuration is shown below.
-The `service` blueprint is service-based: each service can have multiple tasks, where each task is mapped to an
-OpenTelemetry span.
+The `service` blueprint is service-based: each service can have multiple span definitions.
 This blueprint describes a trace that spans multiple services, simulating client-server-producer interactions with
 realistic delays and probabilistic failures (e.g., 20% chance of error injection).
 
@@ -46,7 +45,7 @@ receivers:
           - name: ios_client
             resource:
               service.version: v3
-            tasks:
+            spans:
               - name: send_message_request
                 id: ios_send_message_request
                 kind: client
@@ -58,7 +57,7 @@ receivers:
                   as: absolute
 
           - name: api_gateway
-            tasks:
+            spans:
               - name: receive_api_request
                 id: api_receive_api_request
                 kind: server
@@ -78,13 +77,13 @@ receivers:
                       for: "0.5"
 
           - name: auth_service
-            tasks:
+            spans:
               - name: validate_user_session
                 kind: server
                 parent: call_auth_service
 
           - name: message_write_server
-            tasks:
+            spans:
               - name: receive_write_request
                 kind: server
                 events:

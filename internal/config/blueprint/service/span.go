@@ -5,36 +5,36 @@ import (
 	domaintask "github.com/k4ji/tracesimulator/pkg/model/task"
 )
 
-// Task represents a task in the blueprint.
-type Task struct {
-	// Name is the name of the task.
+// SpanDefinition represents a span definition in the blueprint.
+type SpanDefinition struct {
+	// Name is the name of the span.
 	Name string `mapstructure:"name"`
 
-	// ExternalID is an optional external identifier for the task.
+	// ExternalID is an optional external identifier for the span.
 	ExternalID *string `mapstructure:"id"`
 
-	// Delay specifies the delay in duration or relative duration to parent duration before the task starts.
+	// Delay specifies the delay in duration or relative duration to parent duration before the span starts.
 	Delay *Delay `mapstructure:"delay"`
 
-	// Duration specifies the duration of the task.
+	// Duration specifies the duration of the span.
 	Duration *Duration `mapstructure:"duration"`
 
-	// Kind specifies the type or category of the task (e.g., "client", "server").
+	// Kind specifies the type or category of the span (e.g., "client", "server").
 	Kind string `mapstructure:"kind"`
 
-	// Attributes contains optional attributes for the task.
+	// Attributes contains optional attributes for the span.
 	Attributes map[string]string `mapstructure:"attributes"`
 
-	// Children is a list of child tasks triggered by this task.
-	Children []Task `mapstructure:"children"`
+	// Children is a list of child spans triggered by this span.
+	Children []SpanDefinition `mapstructure:"children"`
 
-	// Events is a list of events associated with the task.
+	// Events is a list of events associated with the span.
 	Events []Event `mapstructure:"events"`
 
-	// Parent is an optional parent task identifier.
+	// Parent is an optional parent span identifier.
 	Parent *string `mapstructure:"parent"`
 
-	// Links is a list of task identifiers this task is linked to.
+	// Links is a list of span identifiers this span is linked to.
 	Links []*string `mapstructure:"links"`
 
 	// ConditionalEffects specifies the effects that can occur based on certain conditions.
@@ -42,7 +42,7 @@ type Task struct {
 }
 
 // To return model.Task
-func (t *Task) To() (*model.Task, error) {
+func (t *SpanDefinition) To() (*model.Task, error) {
 	var externalID *domaintask.ExternalID
 	var parentID *domaintask.ExternalID
 	var links []*domaintask.ExternalID

@@ -17,7 +17,7 @@ receivers:
             resource:
               device.manufacturer: Apple
               service.version: v3
-            tasks:
+            spans:
               - name: send_message_request
                 id: ios_send_message_request
                 kind: client
@@ -40,7 +40,7 @@ receivers:
           - name: api_gateway
             resource:
               service.version: v2
-            tasks:
+            spans:
               - name: receive_api_request
                 id: api_receive_api_request
                 kind: server
@@ -62,7 +62,7 @@ receivers:
           - name: auth_service
             resource:
               service.version: v4
-            tasks:
+            spans:
               - name: validate_user_session
                 kind: server
                 parent: call_auth_service
@@ -73,7 +73,7 @@ receivers:
           - name: message_write_server
             resource:
               service.version: v4
-            tasks:
+            spans:
               - name: receive_write_request
                 kind: server
                 events:
@@ -133,7 +133,7 @@ receivers:
             resource:
               service.version: v2
               service.instance.id: message-event-consumer-1
-            tasks:
+            spans:
               - name: consume_kafka_message
                 kind: consumer
                 delay:
@@ -171,7 +171,7 @@ receivers:
             resource:
               service.version: v2
               service.instance.id: message-event-consumer-2
-            tasks:
+            spans:
               - name: consume_kafka_message
                 kind: consumer
                 delay:
@@ -208,7 +208,7 @@ receivers:
           - name: notification_service
             resource:
               service.version: v2
-            tasks:
+            spans:
               - name: consume_notification
                 kind: consumer
                 delay:
@@ -230,7 +230,7 @@ receivers:
           - name: audit_service
             resource:
               service.version: v2
-            tasks:
+            spans:
               - name: log_message_event
                 kind: consumer
                 delay:
@@ -269,7 +269,7 @@ receivers:
             resource:
               device.manufacturer: Apple
               service.version: v3
-            tasks:
+            spans:
               - name: read_message
                 id: ios_read_message_request
                 kind: client
@@ -283,7 +283,7 @@ receivers:
           - name: api_gateway
             resource:
               service.version: v2
-            tasks:
+            spans:
               - name: receive_read_request
                 kind: server
                 parent: ios_read_message_request
@@ -304,7 +304,7 @@ receivers:
           - name: auth_service
             resource:
               service.version: v4
-            tasks:
+            spans:
               - name: validate_user_session_read
                 kind: server
                 parent: call_auth_service_read
@@ -315,7 +315,7 @@ receivers:
           - name: message_read_server
             resource:
               service.version: v1.0.0
-            tasks:
+            spans:
               - name: receive_read_request_backend
                 kind: server
                 parent: route_message_read
@@ -362,7 +362,7 @@ receivers:
             resource:
               device.manufacturer: Apple
               service.version: v1
-            tasks:
+            spans:
               - name: search_message_request
                 id: ios_search_message_request
                 kind: client
@@ -376,7 +376,7 @@ receivers:
           - name: api_gateway
             resource:
               service.version: v2
-            tasks:
+            spans:
               - name: receive_search_request
                 id: api_receive_search_request
                 kind: server
@@ -398,7 +398,7 @@ receivers:
           - name: auth_service
             resource:
               service.version: v4
-            tasks:
+            spans:
               - name: validate_user_session_search
                 kind: server
                 parent: call_auth_service_search
@@ -409,7 +409,7 @@ receivers:
           - name: search_service
             resource:
               service.version: v2
-            tasks:
+            spans:
               - name: perform_search
                 kind: server
                 parent: route_search_request
@@ -435,7 +435,7 @@ receivers:
             resource:
               device.manufacturer: Apple
               service.version: v2
-            tasks:
+            spans:
               - name: search_message_request
                 id: ios_search_message_request
                 kind: client
@@ -458,7 +458,7 @@ receivers:
           - name: api_gateway
             resource:
               service.version: v2
-            tasks:
+            spans:
               - name: receive_search_request
                 id: api_receive_search_request
                 kind: server
@@ -480,7 +480,7 @@ receivers:
           - name: auth_service
             resource:
               service.version: v4
-            tasks:
+            spans:
               - name: validate_user_session_search
                 kind: server
                 parent: call_auth_service_search
@@ -491,7 +491,7 @@ receivers:
           - name: search_service
             resource:
               service.version: v2
-            tasks:
+            spans:
               - name: perform_search
                 kind: server
                 parent: route_search_request
@@ -517,7 +517,7 @@ receivers:
             resource:
               device.manufacturer: Apple
               service.version: v3
-            tasks:
+            spans:
               - name: search_message_request
                 id: ios_search_message_request
                 kind: client
@@ -540,7 +540,7 @@ receivers:
           - name: api_gateway
             resource:
               service.version: v2
-            tasks:
+            spans:
               - name: receive_search_request
                 id: api_receive_search_request
                 kind: server
@@ -562,7 +562,7 @@ receivers:
           - name: auth_service
             resource:
               service.version: v4
-            tasks:
+            spans:
               - name: validate_user_session_search
                 kind: server
                 parent: call_auth_service_search
@@ -573,7 +573,7 @@ receivers:
           - name: search_service
             resource:
               service.version: v2
-            tasks:
+            spans:
               - name: perform_search
                 kind: server
                 parent: route_search_request
@@ -596,7 +596,7 @@ receivers:
             resource:
               device.manufacturer: Apple
               service.version: v3
-            tasks:
+            spans:
               - name: payment_request
                 id: ios_payment_request
                 kind: client
@@ -610,7 +610,7 @@ receivers:
           - name: payment_service
             resource:
               service.version: v2
-            tasks:
+            spans:
               - name: process_payment
                 kind: server
                 delay:

@@ -16,7 +16,7 @@ receivers:
           - name: client
             resource:
               service.version: 1.0.0
-            tasks:
+            spans:
               - name: send_request
                 id: send_request
                 delay:
@@ -31,7 +31,7 @@ receivers:
           - name: server
             resource:
               service.version: 1.1.0
-            tasks:
+            spans:
               - name: accept_request
                 parent: send_request
                 kind: server
@@ -65,7 +65,7 @@ receivers:
           - name: consumer
             resource:
               service.version: 1.2.0
-            tasks:
+            spans:
               - name: consume_message_event
                 delay:
                   for: 1s

@@ -26,7 +26,7 @@ tests:
           - name: client
             resource:
               os: android
-            tasks:
+            spans:
               - name: send_request
                 id: send_request
                 delay:
@@ -41,7 +41,7 @@ tests:
           - name: server
             resource:
               service.version: 1.1.0
-            tasks:
+            spans:
               - name: accept_request
                 parent: send_request
                 kind: server
@@ -50,7 +50,7 @@ tests:
                     id: produce_message_event
                     kind: producer
           - name: consumer
-            tasks:
+            spans:
               - name: consume_message_event
                 duration:
                   for: 200ms

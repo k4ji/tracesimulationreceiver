@@ -11,7 +11,7 @@ type Config struct {
 	// Global defines global default settings.
 	Global global.Global `mapstructure:"global"`
 
-	// Blueprint defines the blueprint of tasks and their parameters.
+	// Blueprint defines the blueprint of spans and their parameters.
 	Blueprint configBlueprint.Blueprint `mapstructure:"blueprint"`
 }
 

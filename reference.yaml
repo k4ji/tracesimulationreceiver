@@ -11,32 +11,32 @@ receivers:
     ## Blueprint that defines the structure of the traces to be simulated.
     blueprint:
       ## @param type - string - required
-      ## Type of blueprint. 'service' defines services and tasks under them.
+      ## Type of blueprint. 'service' defines services and spans under them.
       type: service
       ## @param service - object - required if type=service
       ## Configuration for services participating in the simulation.
       service:
         ## @param default - object - optional
-        ## Default wait time and duration for tasks if not specified individually.
+        ## Default wait time and duration for spans if not specified individually.
         default:
           ## @param delay - object - optional
-          ## Default wait time before starting a task
+          ## Default wait time before starting a span
           delay:
             ## @param for - string - optional
             ## Default wait time in the format of either
             ## - duration (e.g., 1s, 2m), must be greater than or equal to 0.
-            ## - float (e.g., 0.5 for 50% of the parent task duration), must be greater than or equal to 0 and cannot be set for root tasks.
+            ## - float (e.g., 0.5 for 50% of the parent span duration), must be greater than or equal to 0 and cannot be set for root spans.
             for: 10ms
             ## @param as - string - optional
             ## Type of delay. Can be 'absolute' or 'relative'.
             as: absolute
           ## @param duration - duration - optional
-          ## Default duration of the task, must be greater than 0.
+          ## Default duration of the span, must be greater than 0.
           duration:
             ## @param for - string - optional
             ## Default duration in the format of either
             ## - duration (e.g., 1s, 2m), must be greater than 0.
-            ## - float (e.g., 0.5 for 50% of the parent task duration), must be greater than 0 and cannot be set for root tasks.
+            ## - float (e.g., 0.5 for 50% of the parent span duration), must be greater than 0 and cannot be set for root spans.
             for: "0.8"
             ## @param as - string - optional
             ## Type of duration. Can be 'absolute' or 'relative'.
@@ -51,46 +51,46 @@ receivers:
             ## Resource attributes associated with the service (e.g., OS, instance ID, region).
             resource:
               os: android
-            ## @param tasks - list of objects - required
-            ## Tasks performed by the service, each representing a span.
-            tasks:
+            ## @param spans - list of objects - required
+            ## Spans performed by the service, each representing a span.
+            spans:
               ## @param name - string - required
-              ## Name of the task.
+              ## Name of the span.
               - name: send_request
                 ## @param id - string - optional
-                ## Unique identifier for the task (used for child/linked relationships and span links)
+                ## Unique identifier for the span (used for child/linked relationships and span links)
                 ## Must match the regex `^[a-zA-Z0-9_-]+$`.
                 id: send_request
                 ## @param delay - object - optional if default.delay is set
-                ## Wait time before starting a task.
+                ## Wait time before starting a span.
                 delay:
                   ## @param for - string - optional if default.delay.for is set
                   ## Wait time in one of the following formats:
                   ## - Duration: e.g., 1s, 2m (must be greater than or equal to 0).
-                  ## - Float: e.g., 0.5 (50% of the parent task duration, must be greater than or equal to 0 and cannot be set for root tasks).
+                  ## - Float: e.g., 0.5 (50% of the parent span duration, must be greater than or equal to 0 and cannot be set for root spans).
                   for: 0s
                   ## @param as - string - optional if default.delay.as is set
                   ## Type of delay. Can be one of:
                   ## - 'absolute': Specifies a fixed delay.
-                  ## - 'relative': Specifies a delay relative to the parent task.
+                  ## - 'relative': Specifies a delay relative to the parent span.
                   as: absolute
                 ## @param duration - duration - optional if default.duration is set
-                ## Default duration of the task, must be greater than 0.
+                ## Default duration of the span, must be greater than 0.
                 duration:
                   ## @param for - string - optional if default.duration.for is set
                   ## Default duration in one of the following formats:
                   ## - Absolute: duration (e.g., 1s, 2m), must be greater than 0.
-                  ## - Relative: float (e.g., 0.5 for 50% of the parent task duration), must be greater than 0 and cannot be set for root tasks.
-                  ## Root tasks must specify an absolute duration.
+                  ## - Relative: float (e.g., 0.5 for 50% of the parent span duration), must be greater than 0 and cannot be set for root spans.
+                  ## Root spans must specify an absolute duration.
                   for: 1s
                   ## @param as - string - optional if default.duration.as is set
                   ## Type of duration. Can be one of:
                   ## - 'absolute': Specifies a fixed duration.
-                  ## - 'relative': Specifies a duration relative to the parent task.
-                  ## Root tasks must specify an absolute duration.
+                  ## - 'relative': Specifies a duration relative to the parent span.
+                  ## Root spans must specify an absolute duration.
                   as: absolute
                 ## @param kind - string - optional
-                ## Kind of the task. Can be 'client', 'server', 'producer', 'consumer', or 'internal'.
+                ## Kind of the span. Can be 'client', 'server', 'producer', 'consumer', or 'internal'.
                 kind: client
                 ## @param attributes - map of key/value pairs - optional
                 ## Attributes associated with the service (e.g., version, environment).
@@ -99,15 +99,15 @@ receivers:
           - name: server
             resource:
               service.version: 1.1.0
-            tasks:
+            spans:
               - name: accept_request
                 ## @param parent - string - optional
-                ## The id of the task that this task is a child of.
-                ## You can use this to create a parent-child relationship between tasks
+                ## The id of the span that this span is a child of.
+                ## You can use this to create a parent-child relationship between spans
                 parent: send_request
                 kind: server
                 ## @param events - list of objects - optional
-                ## List of events associated with the task.
+                ## List of events associated with the span.
                 events:
                   ## @param name - string - required
                   ## Name of the event.
@@ -118,12 +118,12 @@ receivers:
                       ## @param for - string - required
                       ## Wait time in one of the following formats:
                       ## - Duration: e.g., 1s, 2m (must be greater than or equal to 0).
-                      ## - Float: e.g., 0.5 (50% of the task duration, must be greater than or equal to 0).
+                      ## - Float: e.g., 0.5 (50% of the span duration, must be greater than or equal to 0).
                       for: 0s
                       ## @param as - string - required
                       ## Type of delay. Can be one of:
                       ## - 'absolute': Specifies a fixed delay.
-                      ## - 'relative': Specifies a delay relative to the task it belongs to..
+                      ## - 'relative': Specifies a delay relative to the span it belongs to..
                       as: absolute
                       ## @param attributes - map of key/value pairs - optional
                       ## Attributes associated with the event (e.g., HTTP method, target).
@@ -131,7 +131,7 @@ receivers:
                       http.method: GET
                       http.target: /api/v1/resource
                 ## @param children - list of objects - optional
-                ## List of child tasks that are executed after the parent task.
+                ## List of child spans that are executed after the parent span.
                 children:
                   - name: produce_message_event
                     id: produce_message_event
@@ -139,21 +139,21 @@ receivers:
                     duration:
                       for: "0.3"
           - name: consumer
-            tasks:
+            spans:
               - name: consume_message_event
                 duration:
                   for: 200ms
                   as: absolute
                 kind: consumer
                 ## @param links - list of strings - optional
-                ## List of task ids that this task is linked to.
+                ## List of span ids that this span is linked to.
                 links:
                   - produce_message_event
                 children:
                   - name: process_message_event
                     kind: internal
                     ## @param conditionalEffects - list of objects - optional
-                    ## List of conditional effects that can be applied to the task.
+                    ## List of conditional effects that can be applied to the span.
                     conditionalEffects:
                       ## @param condition - object - required
                       ## Condition that determines when the effects should be applied.
@@ -174,7 +174,7 @@ receivers:
                           ## Type of effect. Can be 'markAsFailed', 'annotate', or 'recordEvent'.
                           - kind: markAsFailed
                             ## @param markAsFailed - object - required
-                            ## Effect that marks the task as failed, leading to a span with the status 'Error'.
+                            ## Effect that marks the span as failed, leading to a span with the status 'Error'.
                             markAsFailed:
                               ## @param message - string - required
                               ## Message to be logged as `Status.message`.
@@ -191,7 +191,7 @@ receivers:
                             ## @param recordEvent - object - required
                             ## Effect that records an event in the span.
                             recordEvent:
-                              ## @param event - object (same as the event in the task) - required
+                              ## @param event - object (same as the event in the span) - required
                               ## Event to be recorded in the span.
                               event:
                                 name: exception

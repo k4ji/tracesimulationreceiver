@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// Mode represents the mode of task duration
+// Mode represents the mode of span duration
 type Mode string
 
 const (
@@ -30,39 +30,39 @@ func FromString(mode string) Mode {
 	}
 }
 
-// TaskDuration represents a task duration configuration
-type TaskDuration struct {
+// SpanDuration represents a span duration configuration
+type SpanDuration struct {
 	// Duration is the duration string
 	Duration string
 	// Mode is the duration mode (absolute or relative)
 	Mode Mode
 }
 
-// To converts the TaskDuration to an Expression
-func (d *TaskDuration) To() (taskduration.Expression, error) {
+// To converts the SpanDuration to a taskduration.Expression
+func (d *SpanDuration) To() (taskduration.Expression, error) {
 	switch d.Mode {
 	case AbsoluteMode:
 		dur, err := time.ParseDuration(d.Duration)
 		if err != nil {
-			return nil, fmt.Errorf("invalid absolute task duration: %w", err)
+			return nil, fmt.Errorf("invalid absolute span duration: %w", err)
 		}
 		expr, err := taskduration.NewAbsoluteDuration(dur)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create absolute task duration: %w", err)
+			return nil, fmt.Errorf("failed to create absolute span duration: %w", err)
 		}
 		return expr, nil
 	case RelativeMode:
 		f, err := strconv.ParseFloat(d.Duration, 64)
 		if err != nil {
-			return nil, fmt.Errorf("invalid relative task duration: %w", err)
+			return nil, fmt.Errorf("invalid relative span duration: %w", err)
 		}
 		expr, err := taskduration.NewRelativeDuration(f)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create relative task duration: %w", err)
+			return nil, fmt.Errorf("failed to create relative span duration: %w", err)
 		}
 		return expr, nil
 	case UnknownMode:
-		return nil, fmt.Errorf("unsupported task duration mode: %s", d.Mode)
+		return nil, fmt.Errorf("unsupported span duration mode: %s", d.Mode)
 	}
-	return nil, fmt.Errorf("invalid task duration mode: %s", d.Mode)
+	return nil, fmt.Errorf("invalid span duration mode: %s", d.Mode)
 }

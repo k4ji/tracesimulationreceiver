@@ -8,7 +8,7 @@ import (
 
 const DefaultBlueprintType = "service"
 
-// Blueprint represents the configuration for services and their tasks.
+// Blueprint represents the configuration for services and their span definitions.
 type Blueprint struct {
 	Type             string             `mapstructure:"type"`
 	ServiceBlueprint *service.Blueprint `mapstructure:"service"`
