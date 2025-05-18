@@ -21,8 +21,8 @@ func TestConfig_Validate(t *testing.T) {
 							Name: "service1",
 							SpanDefinitions: []service.SpanDefinition{
 								{
-									Name:       "span1",
-									ExternalID: ptrString("span1-id"),
+									Name: "span1",
+									Ref:  ptrString("span1-ref"),
 									Delay: &service.Delay{
 										Value: ptrString("100ms"),
 										Mode:  ptrString("absolute"),
@@ -53,8 +53,8 @@ func TestConfig_Validate(t *testing.T) {
 		assert.Contains(t, err.Error(), "global interval must be greater than 0")
 	})
 
-	t.Run("duplicate span ids", func(t *testing.T) {
-		duplicateID := "span-id"
+	t.Run("duplicate span refs", func(t *testing.T) {
+		duplicateRef := "span-ref"
 		cfg := Config{
 			Global: global.Default(),
 			Blueprint: blueprint.Blueprint{
@@ -75,8 +75,8 @@ func TestConfig_Validate(t *testing.T) {
 							Name: "service1",
 							SpanDefinitions: []service.SpanDefinition{
 								{
-									Name:       "span1",
-									ExternalID: &duplicateID,
+									Name: "span1",
+									Ref:  &duplicateRef,
 									Delay: &service.Delay{
 										Value: ptrString("0"),
 										Mode:  ptrString("absolute"),
@@ -92,8 +92,8 @@ func TestConfig_Validate(t *testing.T) {
 							Name: "service2",
 							SpanDefinitions: []service.SpanDefinition{
 								{
-									Name:       "span2",
-									ExternalID: &duplicateID,
+									Name: "span2",
+									Ref:  &duplicateRef,
 									Delay: &service.Delay{
 										Value: ptrString("0"),
 										Mode:  ptrString("absolute"),
@@ -110,7 +110,7 @@ func TestConfig_Validate(t *testing.T) {
 			},
 		}
 		err := cfg.Validate()
-		assert.EqualError(t, err, "blueprint validation failed: service blueprint validation failed: duplicate span ID span-id found")
+		assert.EqualError(t, err, "blueprint validation failed: service blueprint validation failed: duplicate span ref span-ref found")
 	})
 
 	t.Run("invalid span properties", func(t *testing.T) {

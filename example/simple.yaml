@@ -18,7 +18,7 @@ receivers:
               service.version: 1.0.0
             spans:
               - name: send_request
-                id: send_request
+                ref: send_request
                 delay:
                   for: 0s
                   as: absolute
@@ -53,7 +53,7 @@ receivers:
                       http.status_code: "200"
                 children:
                   - name: produce_message_event
-                    id: produce_message_event
+                    ref: produce_message_event
                     kind: producer
                     duration:
                       for: "0.3"

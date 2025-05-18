@@ -28,7 +28,7 @@ tests:
               os: android
             spans:
               - name: send_request
-                id: send_request
+                ref: send_request
                 delay:
                   for: 0s
                   as: absolute
@@ -47,7 +47,7 @@ tests:
                 kind: server
                 children:
                   - name: produce_message_event
-                    id: produce_message_event
+                    ref: produce_message_event
                     kind: producer
           - name: consumer
             spans:

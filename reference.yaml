@@ -57,10 +57,10 @@ receivers:
               ## @param name - string - required
               ## Name of the span.
               - name: send_request
-                ## @param id - string - optional
+                ## @param ref - string - optional
                 ## Unique identifier for the span (used for child/linked relationships and span links)
                 ## Must match the regex `^[a-zA-Z0-9_-]+$`.
-                id: send_request
+                ref: send_request
                 ## @param delay - object - optional if default.delay is set
                 ## Wait time before starting a span.
                 delay:
@@ -102,7 +102,7 @@ receivers:
             spans:
               - name: accept_request
                 ## @param parent - string - optional
-                ## The id of the span that this span is a child of.
+                ## The ref of the span that this span is a child of.
                 ## You can use this to create a parent-child relationship between spans
                 parent: send_request
                 kind: server
@@ -134,7 +134,7 @@ receivers:
                 ## List of child spans that are executed after the parent span.
                 children:
                   - name: produce_message_event
-                    id: produce_message_event
+                    ref: produce_message_event
                     kind: producer
                     duration:
                       for: "0.3"
@@ -146,7 +146,7 @@ receivers:
                   as: absolute
                 kind: consumer
                 ## @param links - list of strings - optional
-                ## List of span ids that this span is linked to.
+                ## List of span refs that this span is linked to.
                 links:
                   - produce_message_event
                 children:

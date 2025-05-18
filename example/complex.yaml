@@ -19,7 +19,7 @@ receivers:
               service.version: v3
             spans:
               - name: send_message_request
-                id: ios_send_message_request
+                ref: ios_send_message_request
                 kind: client
                 delay:
                   for: 0s
@@ -42,17 +42,17 @@ receivers:
               service.version: v2
             spans:
               - name: receive_api_request
-                id: api_receive_api_request
+                ref: api_receive_api_request
                 kind: server
                 parent: ios_send_message_request
                 children:
                   - name: call_auth_service
-                    id: call_auth_service
+                    ref: call_auth_service
                     kind: client
                     duration:
                       for: "0.1"
                   - name: route_message_request
-                    id: route_message_request
+                    ref: route_message_request
                     kind: client
                     delay:
                       for: "0.3"
@@ -122,7 +122,7 @@ receivers:
                 parent: route_message_request
                 children:
                   - name: produce_message_kafka
-                    id: produce_message_kafka
+                    ref: produce_message_kafka
                     kind: producer
                     attributes:
                       messaging.system: kafka
@@ -156,7 +156,7 @@ receivers:
                       db.system: postgres
                       db.table: messages
                   - name: trigger_notification_event
-                    id: trigger_notification_event-1
+                    ref: trigger_notification_event-1
                     kind: producer
                     delay:
                       for: "0.4"
@@ -194,7 +194,7 @@ receivers:
                       db.system: postgres
                       db.table: messages
                   - name: trigger_notification_event
-                    id: trigger_notification_event-2
+                    ref: trigger_notification_event-2
                     kind: producer
                     delay:
                       for: "0.4"
@@ -271,7 +271,7 @@ receivers:
               service.version: v3
             spans:
               - name: read_message
-                id: ios_read_message_request
+                ref: ios_read_message_request
                 kind: client
                 delay:
                   for: 0s
@@ -289,12 +289,12 @@ receivers:
                 parent: ios_read_message_request
                 children:
                   - name: call_auth_service_read
-                    id: call_auth_service_read
+                    ref: call_auth_service_read
                     kind: client
                     duration:
                       for: "0.1"
                   - name: route_message_read
-                    id: route_message_read
+                    ref: route_message_read
                     kind: client
                     delay:
                       for: "0.3"
@@ -364,7 +364,7 @@ receivers:
               service.version: v1
             spans:
               - name: search_message_request
-                id: ios_search_message_request
+                ref: ios_search_message_request
                 kind: client
                 delay:
                   for: 0s
@@ -378,17 +378,17 @@ receivers:
               service.version: v2
             spans:
               - name: receive_search_request
-                id: api_receive_search_request
+                ref: api_receive_search_request
                 kind: server
                 parent: ios_search_message_request
                 children:
                   - name: call_auth_service_search
-                    id: call_auth_service_search
+                    ref: call_auth_service_search
                     kind: client
                     duration:
                       for: "0.1"
                   - name: route_search_request
-                    id: route_search_request
+                    ref: route_search_request
                     kind: client
                     delay:
                       for: "0.3"
@@ -437,7 +437,7 @@ receivers:
               service.version: v2
             spans:
               - name: search_message_request
-                id: ios_search_message_request
+                ref: ios_search_message_request
                 kind: client
                 delay:
                   for: 0s
@@ -460,17 +460,17 @@ receivers:
               service.version: v2
             spans:
               - name: receive_search_request
-                id: api_receive_search_request
+                ref: api_receive_search_request
                 kind: server
                 parent: ios_search_message_request
                 children:
                   - name: call_auth_service_search
-                    id: call_auth_service_search
+                    ref: call_auth_service_search
                     kind: client
                     duration:
                       for: "0.1"
                   - name: route_search_request
-                    id: route_search_request
+                    ref: route_search_request
                     kind: client
                     delay:
                       for: "0.3"
@@ -519,7 +519,7 @@ receivers:
               service.version: v3
             spans:
               - name: search_message_request
-                id: ios_search_message_request
+                ref: ios_search_message_request
                 kind: client
                 delay:
                   for: 0s
@@ -542,17 +542,17 @@ receivers:
               service.version: v2
             spans:
               - name: receive_search_request
-                id: api_receive_search_request
+                ref: api_receive_search_request
                 kind: server
                 parent: ios_search_message_request
                 children:
                   - name: call_auth_service_search
-                    id: call_auth_service_search
+                    ref: call_auth_service_search
                     kind: client
                     duration:
                       for: "0.1"
                   - name: route_search_request
-                    id: route_search_request
+                    ref: route_search_request
                     kind: client
                     delay:
                       for: "0.3"
@@ -598,7 +598,7 @@ receivers:
               service.version: v3
             spans:
               - name: payment_request
-                id: ios_payment_request
+                ref: ios_payment_request
                 kind: client
                 delay:
                   for: 0s

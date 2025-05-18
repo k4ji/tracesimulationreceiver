@@ -28,14 +28,14 @@ type DefaultValues struct {
 
 // Validate checks the configuration for errors.
 func (bp *Blueprint) Validate() error {
-	taskIDs := make(map[string]struct{})
+	refs := make(map[string]struct{})
 	for _, s := range bp.Services {
 		for _, sd := range s.SpanDefinitions {
-			if sd.ExternalID != nil {
-				if _, exists := taskIDs[*sd.ExternalID]; exists {
-					return fmt.Errorf("duplicate span ID %s found", *sd.ExternalID)
+			if sd.Ref != nil {
+				if _, exists := refs[*sd.Ref]; exists {
+					return fmt.Errorf("duplicate span ref %s found", *sd.Ref)
 				} else {
-					taskIDs[*sd.ExternalID] = struct{}{}
+					refs[*sd.Ref] = struct{}{}
 				}
 			}
 			delay := sd.Delay.WithDefault(bp.Default.Delay)

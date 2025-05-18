@@ -47,7 +47,7 @@ receivers:
               service.version: v3
             spans:
               - name: send_message_request
-                id: ios_send_message_request
+                ref: ios_send_message_request
                 kind: client
                 delay:
                   for: 0s
@@ -59,17 +59,17 @@ receivers:
           - name: api_gateway
             spans:
               - name: receive_api_request
-                id: api_receive_api_request
+                ref: api_receive_api_request
                 kind: server
                 parent: ios_send_message_request
                 children:
                   - name: call_auth_service
-                    id: call_auth_service
+                    ref: call_auth_service
                     kind: client
                     duration:
                       for: "0.1"
                   - name: route_message_request
-                    id: route_message_request
+                    ref: route_message_request
                     kind: client
                     delay:
                       for: "0.3"
@@ -125,7 +125,7 @@ receivers:
                 parent: route_message_request
                 children:
                   - name: produce_message_kafka
-                    id: produce_message_kafka
+                    ref: produce_message_kafka
                     kind: producer
                     attributes:
                       messaging.system: kafka

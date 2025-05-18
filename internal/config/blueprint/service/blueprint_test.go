@@ -200,8 +200,8 @@ func TestTo(t *testing.T) {
 					Name: "service1",
 					SpanDefinitions: []SpanDefinition{
 						{
-							Name:       "span1",
-							ExternalID: ptrString("span1"),
+							Name: "span1",
+							Ref:  ptrString("span1"),
 							Delay: &Delay{
 								Value: ptrString("1ms"),
 								Mode:  ptrString("absolute"),
@@ -248,8 +248,8 @@ func TestTo(t *testing.T) {
 							Children: []SpanDefinition{
 								// missing Value
 								{
-									Name:       "span2-child1",
-									ExternalID: ptrString("span2-child1"),
+									Name: "span2-child1",
+									Ref:  ptrString("span2-child1"),
 									Delay: &Delay{
 										Value: ptrString("6ms"),
 										Mode:  ptrString("absolute"),
@@ -333,9 +333,9 @@ func TestTo(t *testing.T) {
 					Name: "service1",
 					SpanDefinitions: []SpanDefinition{
 						{
-							Name:       "span1",
-							ExternalID: ptrString("^invalid$"),
-							Kind:       "client",
+							Name: "span1",
+							Ref:  ptrString("^invalid$"),
+							Kind: "client",
 						},
 					},
 				},
@@ -343,7 +343,7 @@ func TestTo(t *testing.T) {
 		}
 		_, err := bp.To()
 		assert.Error(t, err)
-		assert.EqualError(t, err, "invalid external ID: ^invalid$")
+		assert.EqualError(t, err, "invalid external ref: ^invalid$")
 	})
 }
 

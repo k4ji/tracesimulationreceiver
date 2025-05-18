@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/k4ji/tracesimulator/pkg/blueprint/service/model"
 	domaintask "github.com/k4ji/tracesimulator/pkg/model/task"
 )
@@ -10,8 +11,8 @@ type SpanDefinition struct {
 	// Name is the name of the span.
 	Name string `mapstructure:"name"`
 
-	// ExternalID is an optional external identifier for the span.
-	ExternalID *string `mapstructure:"id"`
+	// Ref is an optional identifier for the span.
+	Ref *string `mapstructure:"ref"`
 
 	// Delay specifies the delay in duration or relative duration to parent duration before the span starts.
 	Delay *Delay `mapstructure:"delay"`
@@ -31,10 +32,10 @@ type SpanDefinition struct {
 	// Events is a list of events associated with the span.
 	Events []Event `mapstructure:"events"`
 
-	// Parent is an optional parent span identifier.
+	// Parent is an optional parent span ref.
 	Parent *string `mapstructure:"parent"`
 
-	// Links is a list of span identifiers this span is linked to.
+	// Links is a list of span refs this span is linked to.
 	Links []*string `mapstructure:"links"`
 
 	// ConditionalEffects specifies the effects that can occur based on certain conditions.
@@ -56,10 +57,10 @@ func (t *SpanDefinition) To() (*model.Task, error) {
 	if err != nil {
 		return nil, err
 	}
-	if t.ExternalID != nil {
-		externalID, err = domaintask.NewExternalID(*t.ExternalID)
+	if t.Ref != nil {
+		externalID, err = domaintask.NewExternalID(*t.Ref)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("invalid external ref: %s", *t.Ref)
 		}
 	}
 	if t.Parent != nil {
