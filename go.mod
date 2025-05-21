@@ -3,7 +3,7 @@ module github.com/k4ji/tracesimulationreceiver
 go 1.24.1
 
 require (
-	github.com/k4ji/tracesimulator v0.3.2
+	github.com/k4ji/tracesimulator v0.3.3
 	github.com/stretchr/testify v1.10.0
 	go.opentelemetry.io/collector/component v1.32.0
 	go.opentelemetry.io/collector/component/componenttest v0.126.0
@@ -43,7 +43,7 @@ require (
 	go.opentelemetry.io/collector/pdata/pprofile v0.126.0 // indirect
 	go.opentelemetry.io/collector/pipeline v0.126.0 // indirect
 	go.opentelemetry.io/collector/receiver/xreceiver v0.126.0 // indirect
-	go.opentelemetry.io/collector/semconv v0.125.0 // indirect
+	go.opentelemetry.io/collector/semconv v0.126.0 // indirect
 	go.opentelemetry.io/contrib/bridges/otelzap v0.10.0 // indirect
 	go.opentelemetry.io/otel v1.35.0 // indirect
 	go.opentelemetry.io/otel/log v0.11.0 // indirect
