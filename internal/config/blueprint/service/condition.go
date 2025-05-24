@@ -31,9 +31,10 @@ func (c *Condition) To() (*task.Condition, error) {
 		if c.Probabilistic.Threshold < 0 || c.Probabilistic.Threshold > 1 {
 			return nil, fmt.Errorf("probabilistic condition threshold must be between 0 and 1")
 		}
-		condition := task.NewProbabilisticCondition(c.Probabilistic.Threshold)
 		condition := task.NewProbabilisticCondition(c.Probabilistic.Threshold, rand.New(rand.NewSource(time.Now().UnixNano())).Float64)
 		return &condition, nil
+	case "childMarkedAsFailed":
+		condition := task.NewAtLeastCondition(1, task.NewChildCondition(task.NewMarkedAsFailedCondition()))
 		return &condition, nil
 	default:
 		return nil, fmt.Errorf("unknown condition type: %s", c.Kind)

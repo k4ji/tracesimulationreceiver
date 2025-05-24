@@ -159,7 +159,9 @@ receivers:
                       ## Condition that determines when the effects should be applied.
                       - condition:
                           ## @param type - string - required
-                          ## Type of condition. Currently, only 'probabilistic' is supported.
+                          ## Type of condition. Available types are the following:
+                          ## - probabilistic: Applies effects based on a probability threshold.
+                          ## - childMarkedAsFailed: Applies effects if the child span of the span is marked as failed.
                           kind: probabilistic
                           ## @param probabilistic - object - required
                           ## Probabilistic condition that determines the probability of the effects being applied.
