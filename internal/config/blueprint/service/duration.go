@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/k4ji/tracesimulationreceiver/internal/config/utils"
-	"github.com/k4ji/tracesimulator/pkg/model/task"
+	"github.com/k4ji/tracesimulationreceiver/internal/tracesimulator/model/task"
 	"strconv"
 	"time"
 )

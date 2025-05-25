@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/k4ji/tracesimulator/pkg/model/task"
-	"github.com/k4ji/tracesimulator/pkg/model/task/taskduration"
+	"github.com/k4ji/tracesimulationreceiver/internal/tracesimulator/model/task"
+	"github.com/k4ji/tracesimulationreceiver/internal/tracesimulator/model/task/taskduration"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"

@@ -2,7 +2,7 @@ package service
 
 import (
 	"fmt"
-	"github.com/k4ji/tracesimulator/pkg/model/task"
+	"github.com/k4ji/tracesimulationreceiver/internal/tracesimulator/model/task"
 )
 
 // ConditionalEffect represents a conditional effect that can be applied to a span.

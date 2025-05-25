@@ -2,8 +2,8 @@ package tracesimulationreceiver
 
 import (
 	"context"
-	simulator "github.com/k4ji/tracesimulator/pkg"
-	"github.com/k4ji/tracesimulator/pkg/blueprint"
+	simulator "github.com/k4ji/tracesimulationreceiver/internal/tracesimulator"
+	"github.com/k4ji/tracesimulationreceiver/internal/tracesimulator/blueprint"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/ptrace"

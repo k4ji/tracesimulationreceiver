@@ -3,7 +3,7 @@ package blueprint
 import (
 	"fmt"
 	"github.com/k4ji/tracesimulationreceiver/internal/config/blueprint/service"
-	"github.com/k4ji/tracesimulator/pkg/blueprint"
+	"github.com/k4ji/tracesimulationreceiver/internal/tracesimulator/blueprint"
 )
 
 const DefaultBlueprintType = "service"

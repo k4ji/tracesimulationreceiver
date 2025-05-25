@@ -2,8 +2,8 @@ package service
 
 import (
 	"fmt"
-	"github.com/k4ji/tracesimulator/pkg/blueprint/service/model"
-	domaintask "github.com/k4ji/tracesimulator/pkg/model/task"
+	"github.com/k4ji/tracesimulationreceiver/internal/tracesimulator/blueprint/service/model"
+	domaintask "github.com/k4ji/tracesimulationreceiver/internal/tracesimulator/model/task"
 )
 
 // SpanDefinition represents a span definition in the blueprint.
