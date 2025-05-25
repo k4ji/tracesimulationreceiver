@@ -2,9 +2,9 @@ package service
 
 import (
 	"fmt"
-	"github.com/k4ji/tracesimulator/pkg/blueprint"
-	"github.com/k4ji/tracesimulator/pkg/blueprint/service"
-	"github.com/k4ji/tracesimulator/pkg/blueprint/service/model"
+	"github.com/k4ji/tracesimulationreceiver/internal/tracesimulator/blueprint"
+	"github.com/k4ji/tracesimulationreceiver/internal/tracesimulator/blueprint/service"
+	"github.com/k4ji/tracesimulationreceiver/internal/tracesimulator/blueprint/service/model"
 )
 
 type Blueprint struct {

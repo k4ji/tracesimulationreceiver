@@ -1,6 +1,6 @@
 package service
 
-import "github.com/k4ji/tracesimulator/pkg/blueprint/service/model"
+import "github.com/k4ji/tracesimulationreceiver/internal/tracesimulator/blueprint/service/model"
 
 // Service represents a service in the blueprint.
 type Service struct {

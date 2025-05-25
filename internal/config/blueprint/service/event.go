@@ -1,6 +1,6 @@
 package service
 
-import "github.com/k4ji/tracesimulator/pkg/model/task"
+import "github.com/k4ji/tracesimulationreceiver/internal/tracesimulator/model/task"
 
 type Event struct {
 	Name       string            `mapstructure:"name"`
