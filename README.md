@@ -169,7 +169,7 @@ docker run --rm --name jaeger \
 
 ```shell
 docker run --rm \
-  ghcr.io/k4ji/otelcol-tracesimulationreceiver:v0.4.1 \
+  ghcr.io/k4ji/otelcol-tracesimulationreceiver:v0.4.2 \
   --config /etc/otelcol/example/complex.yaml
  ```
 
