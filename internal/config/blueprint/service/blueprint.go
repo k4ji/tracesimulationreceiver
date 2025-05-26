@@ -23,7 +23,7 @@ type DefaultValues struct {
 	Duration *Duration `mapstructure:"duration"`
 
 	// ConditionalEffects specifies the default conditional effects for spans.
-	ConditionalEffects []ConditionalEffect `mapstructure:"conditionalEffects"`
+	ConditionalEffects []ConditionalEffect `mapstructure:"conditional_effects"`
 }
 
 // Validate checks the configuration for errors.

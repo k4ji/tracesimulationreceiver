@@ -167,7 +167,7 @@ Add events to a span:
 
 ## 5. Conditional Effects
 
-Apply behavior randomly using `conditionalEffects`:
+Apply behavior randomly using `conditional_effects`:
 
 ```yaml
   tracesimulationreceiver:
@@ -185,21 +185,21 @@ Apply behavior randomly using `conditionalEffects`:
                   as: absolute
                 links:
                   - child
-                conditionalEffects:
+                conditional_effects:
                   - condition:
                       kind: probabilistic
                       probabilistic:
                         threshold: 0.2
                     effects:
-                      - kind: markAsFailed
-                        markAsFailed:
+                      - kind: mark_as_failed
+                        mark_as_failed:
                           message: "Simulated failure"
                       - kind: annotate
                         annotate:
                           attributes:
                             error.type: "SimError"
-                      - kind: recordEvent
-                        recordEvent:
+                      - kind: record_event
+                        record_event:
                           event:
                             name: exception
                             delay:

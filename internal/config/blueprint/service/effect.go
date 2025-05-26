@@ -9,12 +9,12 @@ import (
 type Effect struct {
 	// Kind is the kind of effect to be applied.
 	Kind string `mapstructure:"kind"`
-	// MarkAsFailed is the effect to mark the span as failed.
-	MarkAsFailed MarkAsFailed `mapstructure:"markAsFailed"`
+	// mark_as_failed is the effect to mark the span as failed.
+	MarkAsFailed MarkAsFailed `mapstructure:"mark_as_failed"`
 	// Annotate is the effect to annotate the span.
 	Annotate Annotate `mapstructure:"annotate"`
 	// RecordEvent is the effect to record an event.
-	RecordEvent RecordEvent `mapstructure:"recordEvent"`
+	RecordEvent RecordEvent `mapstructure:"record_event"`
 }
 
 // MarkAsFailed represents an effect that marks a span as failed.
@@ -37,13 +37,13 @@ type RecordEvent struct {
 // To converts the effect to a domain model.
 func (e *Effect) To() (*task.Effect, error) {
 	switch e.Kind {
-	case "markAsFailed":
+	case "mark_as_failed":
 		e := task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect(&e.MarkAsFailed.Message))
 		return &e, nil
 	case "annotate":
 		e := task.FromAnnotateEffect(task.NewAnnotateEffect(e.Annotate.Attributes))
 		return &e, nil
-	case "recordEvent":
+	case "record_event":
 		event, err := e.RecordEvent.Event.To()
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert record event effect: %w", err)

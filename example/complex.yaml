@@ -27,14 +27,14 @@ receivers:
                 duration:
                   for: 2s
                   as: absolute
-                conditionalEffects:
+                conditional_effects:
                   - condition:
                       kind: probabilistic
                       probabilistic:
                         threshold: 0.2
                     effects:
-                      - kind: markAsFailed
-                        markAsFailed:
+                      - kind: mark_as_failed
+                        mark_as_failed:
                           message: "Process failed"
 
           - name: api_gateway
@@ -92,21 +92,21 @@ receivers:
                       http.method: POST
                       http.target: /api/v1/messages
                       http.status_code: "200"
-                conditionalEffects:
+                conditional_effects:
                   - condition:
                       kind: probabilistic
                       probabilistic:
                         threshold: 0.2
                     effects:
-                      - kind: markAsFailed
-                        markAsFailed:
+                      - kind: mark_as_failed
+                        mark_as_failed:
                           message: Rate limit exceeded
                       - kind: annotate
                         annotate:
                           attributes:
                             error.type: RateLimitExceededException
-                      - kind: recordEvent
-                        recordEvent:
+                      - kind: record_event
+                        record_event:
                           event:
                             name: exception
                             delay:
@@ -445,12 +445,12 @@ receivers:
                 duration:
                   for: 500ms
                   as: absolute
-                conditionalEffects:
+                conditional_effects:
                   - condition:
-                      kind: childMarkedAsFailed
+                      kind: child_marked_as_failed
                     effects:
-                      - kind: markAsFailed
-                        markAsFailed:
+                      - kind: mark_as_failed
+                        mark_as_failed:
                           message: Service Returned Error
 
           - name: api_gateway
@@ -461,12 +461,12 @@ receivers:
                 ref: api_receive_search_request
                 kind: server
                 parent: ios_search_message_request
-                conditionalEffects:
+                conditional_effects:
                 - condition:
-                    kind: childMarkedAsFailed
+                    kind: child_marked_as_failed
                   effects:
-                    - kind: markAsFailed
-                      markAsFailed:
+                    - kind: mark_as_failed
+                      mark_as_failed:
                         message: Search request failed
                 children:
                   - name: call_auth_service_search
@@ -481,12 +481,12 @@ receivers:
                       for: "0.3"
                     duration:
                       for: "0.5"
-                    conditionalEffects:
+                    conditional_effects:
                       - condition:
-                          kind: childMarkedAsFailed
+                          kind: child_marked_as_failed
                         effects:
-                          - kind: markAsFailed
-                            markAsFailed:
+                          - kind: mark_as_failed
+                            mark_as_failed:
                               message: Search request failed
 
 
@@ -511,14 +511,14 @@ receivers:
                 attributes:
                   db.system: elasticsearch
                   db.operation: search
-                conditionalEffects:
+                conditional_effects:
                   - condition:
                       kind: probabilistic
                       probabilistic:
                         threshold: 0.8
                     effects:
-                      - kind: markAsFailed
-                        markAsFailed:
+                      - kind: mark_as_failed
+                        mark_as_failed:
                           message: Process failed
 
   tracesimulationreceiver/search_message_request_v3:
@@ -549,14 +549,14 @@ receivers:
                 duration:
                   for: 500ms
                   as: absolute
-                conditionalEffects:
+                conditional_effects:
                   - condition:
                       kind: probabilistic
                       probabilistic:
                         threshold: 0.8
                     effects:
-                      - kind: markAsFailed
-                        markAsFailed:
+                      - kind: mark_as_failed
+                        mark_as_failed:
                           message: Invalid input
 
           - name: api_gateway

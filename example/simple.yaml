@@ -84,14 +84,14 @@ receivers:
                 children:
                   - name: process_message_event
                     kind: internal
-                    conditionalEffects:
+                    conditional_effects:
                       - condition:
                           kind: probabilistic
                           probabilistic:
                             threshold: 0.2
                         effects:
-                          - kind: markAsFailed
-                            markAsFailed:
+                          - kind: mark_as_failed
+                            mark_as_failed:
                               message: Invalid message
                           - kind: annotate
                             annotate:

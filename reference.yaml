@@ -152,16 +152,16 @@ receivers:
                 children:
                   - name: process_message_event
                     kind: internal
-                    ## @param conditionalEffects - list of objects - optional
+                    ## @param conditional_effects - list of objects - optional
                     ## List of conditional effects that can be applied to the span.
-                    conditionalEffects:
+                    conditional_effects:
                       ## @param condition - object - required
                       ## Condition that determines when the effects should be applied.
                       - condition:
                           ## @param type - string - required
                           ## Type of condition. Available types are the following:
                           ## - probabilistic: Applies effects based on a probability threshold.
-                          ## - childMarkedAsFailed: Applies effects if the child span of the span is marked as failed.
+                          ## - child_marked_as_failed: Applies effects if the child span of the span is marked as failed.
                           kind: probabilistic
                           ## @param probabilistic - object - required
                           ## Probabilistic condition that determines the probability of the effects being applied.
@@ -173,11 +173,11 @@ receivers:
                         ## List of effects to be applied if the condition is met.
                         effects:
                           ## @param kind - string - required
-                          ## Type of effect. Can be 'markAsFailed', 'annotate', or 'recordEvent'.
-                          - kind: markAsFailed
-                            ## @param markAsFailed - object - required
+                          ## Type of effect. Can be 'mark_as_failed', 'annotate', or 'record_event'.
+                          - kind: mark_as_failed
+                            ## @param mark_as_failed - object - required
                             ## Effect that marks the span as failed, leading to a span with the status 'Error'.
-                            markAsFailed:
+                            mark_as_failed:
                               ## @param message - string - required
                               ## Message to be logged as `Status.message`.
                               message: "Failed to process message event"
@@ -189,10 +189,10 @@ receivers:
                               ## Attributes to be added to the span.
                               attributes:
                                 error.type: "ProcessingError"
-                          - kind: recordEvent
-                            ## @param recordEvent - object - required
+                          - kind: record_event
+                            ## @param record_event - object - required
                             ## Effect that records an event in the span.
-                            recordEvent:
+                            record_event:
                               ## @param event - object (same as the event in the span) - required
                               ## Event to be recorded in the span.
                               event:

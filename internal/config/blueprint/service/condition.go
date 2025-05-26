@@ -33,7 +33,7 @@ func (c *Condition) To() (*task.Condition, error) {
 		}
 		condition := task.NewProbabilisticCondition(c.Probabilistic.Threshold, rand.New(rand.NewSource(time.Now().UnixNano())).Float64)
 		return &condition, nil
-	case "childMarkedAsFailed":
+	case "child_marked_as_failed":
 		condition := task.NewAtLeastCondition(1, task.NewChildCondition(task.NewMarkedAsFailedCondition()))
 		return &condition, nil
 	default:

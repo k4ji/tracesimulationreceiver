@@ -95,21 +95,21 @@ receivers:
                       http.method: POST
                       http.target: /api/v1/messages
                       http.status_code: "200"
-                conditionalEffects:
+                conditional_effects:
                   - condition:
                       kind: probabilistic
                       probabilistic:
                         threshold: 0.2
                     effects:
-                      - kind: markAsFailed
-                        markAsFailed:
+                      - kind: mark_as_failed
+                        mark_as_failed:
                           message: Rate limit exceeded
                       - kind: annotate
                         annotate:
                           attributes:
                             error.type: RateLimitExceededException
-                      - kind: recordEvent
-                        recordEvent:
+                      - kind: record_event
+                        record_event:
                           event:
                             name: exception
                             delay:

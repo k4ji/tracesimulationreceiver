@@ -39,7 +39,7 @@ type SpanDefinition struct {
 	Links []*string `mapstructure:"links"`
 
 	// ConditionalEffects specifies the effects that can occur based on certain conditions.
-	ConditionalEffects []ConditionalEffect `mapstructure:"conditionalEffects"`
+	ConditionalEffects []ConditionalEffect `mapstructure:"conditional_effects"`
 }
 
 // To return model.Task
