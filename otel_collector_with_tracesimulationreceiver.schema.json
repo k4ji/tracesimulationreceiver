@@ -1,0 +1,361 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OpenTelemetry Collector Config Schema (with TraceSimulationReceiver)",
+  "type": "object",
+  "properties": {
+    "receivers": {
+      "type": "object",
+      "properties": {
+        "tracesimulationreceiver": {
+          "type": "object",
+          "properties": {
+            "global": {
+              "type": "object",
+              "properties": {
+                "interval": {
+                  "type": "string"
+                }
+              },
+              "required": []
+            },
+            "blueprint": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "service": {
+                  "type": "object",
+                  "properties": {
+                    "default": {
+                      "type": "object",
+                      "properties": {
+                        "delay": {
+                          "type": "object",
+                          "properties": {
+                            "for": {
+                              "type": "string"
+                            },
+                            "as": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "duration": {
+                          "type": "object",
+                          "properties": {
+                            "for": {
+                              "type": "string"
+                            },
+                            "as": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "services": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/service"
+                      }
+                    }
+                  },
+                  "required": [
+                    "services"
+                  ]
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          },
+          "required": [
+            "global",
+            "blueprint"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "required": [
+        "tracesimulationreceiver"
+      ]
+    },
+    "exporters": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "processors": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "service": {
+      "type": "object",
+      "properties": {
+        "telemetry": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "pipelines": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "receivers": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "processors": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "exporters": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "receivers",
+              "exporters"
+            ]
+          }
+        }
+      },
+      "required": [
+        "pipelines"
+      ]
+    }
+  },
+  "definitions": {
+    "service": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "resource": {
+          "type": "object"
+        },
+        "spans": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/span"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "spans"
+      ]
+    },
+    "span": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string"
+        },
+        "delay": {
+          "type": "object",
+          "properties": {
+            "for": {
+              "type": "string"
+            },
+            "as": {
+              "type": "string"
+            }
+          }
+        },
+        "duration": {
+          "type": "object",
+          "properties": {
+            "for": {
+              "type": "string"
+            },
+            "as": {
+              "type": "string"
+            }
+          }
+        },
+        "kind": {
+          "type": "string"
+        },
+        "attributes": {
+          "type": "object"
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "delay": {
+                "type": "object",
+                "properties": {
+                  "for": {
+                    "type": "string"
+                  },
+                  "as": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "for",
+                  "as"
+                ]
+              },
+              "attributes": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "name",
+              "delay"
+            ]
+          }
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/span"
+          }
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "conditional_effects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string"
+                  },
+                  "probabilistic": {
+                    "type": "object",
+                    "properties": {
+                      "threshold": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "threshold"
+                    ]
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              },
+              "effects": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string"
+                    },
+                    "mark_as_failed": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "message"
+                      ]
+                    },
+                    "annotate": {
+                      "type": "object",
+                      "properties": {
+                        "attributes": {
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "attributes"
+                      ]
+                    },
+                    "record_event": {
+                      "type": "object",
+                      "properties": {
+                        "event": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "delay": {
+                              "type": "object",
+                              "properties": {
+                                "for": {
+                                  "type": "string"
+                                },
+                                "as": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "attributes": {
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "name",
+                            "delay"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "event"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "condition",
+              "effects"
+            ]
+          }
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  "required": [
+    "receivers",
+    "service"
+  ]
+}

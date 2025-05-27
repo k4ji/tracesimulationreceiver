@@ -130,7 +130,7 @@ receivers:
                     attributes:
                       http.method: GET
                       http.target: /api/v1/resource
-                ## @param children - list of objects - optional
+                ## @param children - list of objects (same as spans) - optional
                 ## List of child spans that are executed after the parent span.
                 children:
                   - name: produce_message_event

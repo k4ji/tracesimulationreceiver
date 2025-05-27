@@ -2,6 +2,9 @@
 
 These short tutorials will help you get started with the `TraceSimulationReceiver` by showing how to generate synthetic traces using a simple OpenTelemetry Collector config.
 
+> 💡 A JSON Schema file is available to help you write and validate your YAML config for the OpenTelemetry Collector with `TraceSimulationReceiver`.  
+> You can find it in the repository: `otel_collector_with_tracesimulationreceiver.schema.json`
+
 ---
 
 ## 1. Getting Started
