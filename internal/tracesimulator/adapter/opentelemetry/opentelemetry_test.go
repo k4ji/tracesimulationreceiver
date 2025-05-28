@@ -8,7 +8,7 @@ import (
 	"github.com/k4ji/tracesimulationreceiver/internal/tracesimulator/model/task/taskduration"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/collector/pdata/ptrace"
-	conventions "go.opentelemetry.io/collector/semconv/v1.27.0"
+	conventions "go.opentelemetry.io/otel/semconv/v1.27.0"
 	mathRand "math/rand"
 	"testing"
 	"time"
@@ -269,7 +269,7 @@ func TestAdapter_Transform(t *testing.T) {
 			rs := trace.ResourceSpans()
 			for i := 0; i < rs.Len(); i++ {
 				resource := rs.At(i).Resource()
-				serviceName, _ := resource.Attributes().Get(conventions.AttributeServiceName)
+				serviceName, _ := resource.Attributes().Get(string(conventions.ServiceNameKey))
 				expectedResource, exists := expectedResources[serviceName.AsString()]
 				assert.True(t, exists, "Unexpected service name: %s", serviceName.AsString())
 				for key, value := range expectedResource {

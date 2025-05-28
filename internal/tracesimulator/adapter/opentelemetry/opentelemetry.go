@@ -6,7 +6,7 @@ import (
 	"github.com/k4ji/tracesimulationreceiver/internal/tracesimulator/model/span"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/ptrace"
-	conventions "go.opentelemetry.io/collector/semconv/v1.27.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.27.0"
 )
 
 const DefaultInstrumentationScopeName = "tracesimulator"
@@ -55,7 +55,7 @@ func (a *Adapter) createOrGetScopeSpans(otelTrace *ptrace.Traces, node *span.Tre
 	if node.IsResourceEntryPoint() {
 		resourceSpans := otelTrace.ResourceSpans().AppendEmpty()
 		resource := resourceSpans.Resource()
-		resource.Attributes().PutStr(conventions.AttributeServiceName, node.Resource().Name())
+		resource.Attributes().PutStr(string(semconv.ServiceNameKey), node.Resource().Name())
 		for k, v := range node.Resource().Attributes() {
 			resource.Attributes().PutStr(k, v)
 		}
