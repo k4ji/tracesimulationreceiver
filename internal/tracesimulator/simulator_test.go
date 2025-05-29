@@ -278,7 +278,7 @@ func TestSimulator_Run(t *testing.T) {
 		assert.Equal(t, "service-a", linkedSpan.Resource().Name())
 	})
 
-	t.Run("adjust span timestamps to ensure all end before current time", func(t *testing.T) {
+	t.Run("adjust span timestamps to ensure all end before base end time", func(t *testing.T) {
 		// The longest trace takes 5000ms where childA1, which has startAfter of 1000ms, plus rootC, which has startAfter of 1000ms and duration of 3000ms.
 		expectedStartTime := now.Add(-5000 * time.Millisecond)
 		rootA := traces[0]

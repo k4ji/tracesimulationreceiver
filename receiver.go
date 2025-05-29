@@ -15,12 +15,13 @@ import (
 var _ receiver.Traces = (*traceSimReceiver)(nil)
 
 type traceSimReceiver struct {
-	cancel       context.CancelFunc
-	logger       *zap.Logger
-	nextConsumer consumer.Traces
-	simulator    *simulator.Simulator[[]ptrace.Traces]
-	interval     time.Duration
-	blueprint    blueprint.Blueprint
+	cancel        context.CancelFunc
+	logger        *zap.Logger
+	nextConsumer  consumer.Traces
+	simulator     *simulator.Simulator[[]ptrace.Traces]
+	interval      time.Duration
+	endTimeOffset time.Duration
+	blueprint     blueprint.Blueprint
 }
 
 func (r *traceSimReceiver) Start(ctx context.Context, _ component.Host) error {
@@ -48,7 +49,7 @@ func (r *traceSimReceiver) Start(ctx context.Context, _ component.Host) error {
 }
 
 func (r *traceSimReceiver) emitTracesOnce(ctx context.Context) error {
-	traces, err := r.simulator.Run(r.blueprint, time.Now())
+	traces, err := r.simulator.Run(r.blueprint, time.Now().Add(r.endTimeOffset))
 	if err != nil {
 		r.logger.Error("Error generating traces", zap.Error(err))
 		return err

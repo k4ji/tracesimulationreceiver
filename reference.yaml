@@ -7,6 +7,10 @@ receivers:
       ## Interval at which traces are generated, must be greater than 0.
       ## Default: 5s
       interval: 5s
+      ## @param end_time_offset - duration - optional
+      ## Offset from the current time to determine the end time of the longest trace.
+      ## Default: 0s (The end time of the last span of the longest trace is the current time).
+      end_time_offset: 0s
     ## @param blueprint - object - required
     ## Blueprint that defines the structure of the traces to be simulated.
     blueprint:

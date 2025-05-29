@@ -32,11 +32,12 @@ func createTracesReceiver(_ context.Context, params receiver.Settings, baseCfg c
 	}
 
 	rcvr := traceSimReceiver{
-		logger:       logger,
-		nextConsumer: consumer,
-		simulator:    simulator.New[[]ptrace.Traces](opentelemetry.NewAdapter()),
-		interval:     cfg.Global.Interval,
-		blueprint:    bp,
+		logger:        logger,
+		nextConsumer:  consumer,
+		simulator:     simulator.New[[]ptrace.Traces](opentelemetry.NewAdapter()),
+		interval:      cfg.Global.Interval,
+		endTimeOffset: cfg.Global.EndTimeOffset,
+		blueprint:     bp,
 	}
 
 	return &rcvr, nil
