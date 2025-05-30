@@ -12,7 +12,7 @@ type Duration struct {
 
 func NewDuration(expr taskduration.Expression) (*Duration, error) {
 	if expr == nil {
-		panic("expr cannot be nil")
+		return nil, fmt.Errorf("duration expression cannot be nil")
 	}
 	return &Duration{expr: expr}, nil
 }

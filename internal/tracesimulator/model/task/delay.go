@@ -12,7 +12,7 @@ type Delay struct {
 
 func NewDelay(expr taskduration.Expression) (*Delay, error) {
 	if expr == nil {
-		panic("expr cannot be nil")
+		return nil, fmt.Errorf("delay expression cannot be nil")
 	}
 	return &Delay{expr: expr}, nil
 }

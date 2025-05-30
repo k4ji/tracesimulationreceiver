@@ -19,9 +19,8 @@ func TestNewDelay(t *testing.T) {
 	})
 
 	t.Run("nil expression", func(t *testing.T) {
-		assert.Panics(t, func() {
-			_, _ = task.NewDelay(nil)
-		}, "Expected panic when expression is nil")
+		_, err := task.NewDelay(nil)
+		assert.Error(t, err, "delay expression cannot be nil")
 	})
 }
 

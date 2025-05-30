@@ -19,9 +19,8 @@ func TestNewDuration(t *testing.T) {
 	})
 
 	t.Run("nil expression", func(t *testing.T) {
-		assert.Panics(t, func() {
-			_, _ = task.NewDuration(nil)
-		}, "Expected panic when expression is nil")
+		_, err := task.NewDuration(nil)
+		assert.Error(t, err, "duration expression cannot be nil")
 	})
 }
 
