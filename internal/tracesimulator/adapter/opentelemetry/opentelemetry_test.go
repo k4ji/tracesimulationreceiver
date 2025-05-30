@@ -209,7 +209,7 @@ func TestAdapter_Transform(t *testing.T) {
 					Attributes: map[string]string{
 						"attribute-key-root-task-d": "attribute-value-root-task-d",
 					},
-					ConditionalDefinition: []*task.ConditionalDefinition{
+					ConditionalDefinition: []task.ConditionalDefinition{
 						task.NewConditionalDefinition(
 							task.NewProbabilisticCondition(1.0, mathRand.Float64),
 							[]task.Effect{

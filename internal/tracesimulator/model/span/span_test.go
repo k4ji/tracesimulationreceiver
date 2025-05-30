@@ -46,7 +46,7 @@ func TestFromTaskTree(t *testing.T) {
 								make(map[string]string),
 							),
 						},
-						[]*task.ConditionalDefinition{
+						[]task.ConditionalDefinition{
 							task.NewConditionalDefinition(
 								task.NewProbabilisticCondition(1.0, func() float64 { return 1.0 }),
 								[]task.Effect{
@@ -98,7 +98,7 @@ func TestFromTaskTree(t *testing.T) {
 							nil,
 							[]*task.ExternalID{},
 							[]task.Event{},
-							[]*task.ConditionalDefinition{},
+							[]task.ConditionalDefinition{},
 						)
 						return def
 					}(),
@@ -119,7 +119,7 @@ func TestFromTaskTree(t *testing.T) {
 								nil,
 								[]*task.ExternalID{},
 								[]task.Event{},
-								[]*task.ConditionalDefinition{},
+								[]task.ConditionalDefinition{},
 							)
 							return def
 						}(),
@@ -194,7 +194,7 @@ func TestFromTaskTree(t *testing.T) {
 							nil,
 							[]*task.ExternalID{},
 							[]task.Event{},
-							[]*task.ConditionalDefinition{},
+							[]task.ConditionalDefinition{},
 						)
 						return def
 					}(),
@@ -215,7 +215,7 @@ func TestFromTaskTree(t *testing.T) {
 								nil,
 								[]*task.ExternalID{},
 								[]task.Event{},
-								[]*task.ConditionalDefinition{},
+								[]task.ConditionalDefinition{},
 							)
 							return def
 						}(),
@@ -291,7 +291,7 @@ func TestFromTaskTree(t *testing.T) {
 							nil,
 							[]*task.ExternalID{},
 							[]task.Event{},
-							[]*task.ConditionalDefinition{},
+							[]task.ConditionalDefinition{},
 						)
 						return def
 					}(),
@@ -312,7 +312,7 @@ func TestFromTaskTree(t *testing.T) {
 								nil,
 								[]*task.ExternalID{},
 								[]task.Event{},
-								[]*task.ConditionalDefinition{},
+								[]task.ConditionalDefinition{},
 							)
 							return def
 						}(),
@@ -394,7 +394,7 @@ func TestFromTaskTree(t *testing.T) {
 									make(map[string]string),
 								),
 							},
-							[]*task.ConditionalDefinition{},
+							[]task.ConditionalDefinition{},
 						)
 						return def
 					}(),
@@ -421,7 +421,7 @@ func TestFromTaskTree(t *testing.T) {
 										make(map[string]string),
 									),
 								},
-								[]*task.ConditionalDefinition{},
+								[]task.ConditionalDefinition{},
 							)
 							return def
 						}(),
@@ -501,7 +501,7 @@ func TestFromTaskTree(t *testing.T) {
 							nil,
 							[]*task.ExternalID{},
 							[]task.Event{},
-							[]*task.ConditionalDefinition{},
+							[]task.ConditionalDefinition{},
 						)
 						return def
 					}(),
@@ -522,7 +522,7 @@ func TestFromTaskTree(t *testing.T) {
 								nil,
 								[]*task.ExternalID{},
 								[]task.Event{},
-								[]*task.ConditionalDefinition{},
+								[]task.ConditionalDefinition{},
 							)
 							return def
 						}(),
@@ -596,7 +596,7 @@ func TestFromTaskTree(t *testing.T) {
 						nil,
 						[]*task.ExternalID{},
 						[]task.Event{},
-						[]*task.ConditionalDefinition{
+						[]task.ConditionalDefinition{
 							task.NewConditionalDefinition(
 								task.NewProbabilisticCondition(0.5, func() float64 { return 0.4 }),
 								[]task.Effect{
@@ -652,7 +652,7 @@ func TestFromTaskTree(t *testing.T) {
 						nil,
 						[]*task.ExternalID{},
 						[]task.Event{},
-						[]*task.ConditionalDefinition{
+						[]task.ConditionalDefinition{
 							task.NewConditionalDefinition(
 								task.NewProbabilisticCondition(0.5, func() float64 { return 0.6 }),
 								[]task.Effect{
@@ -706,7 +706,7 @@ func TestFromTaskTree(t *testing.T) {
 						nil,
 						[]*task.ExternalID{},
 						[]task.Event{},
-						[]*task.ConditionalDefinition{
+						[]task.ConditionalDefinition{
 							task.NewConditionalDefinition(
 								task.NewProbabilisticCondition(0.5, func() float64 { return 0.4 }),
 								[]task.Effect{
@@ -754,7 +754,7 @@ func TestFromTaskTree(t *testing.T) {
 						nil,
 						[]*task.ExternalID{},
 						[]task.Event{},
-						[]*task.ConditionalDefinition{
+						[]task.ConditionalDefinition{
 							task.NewConditionalDefinition(
 								task.NewProbabilisticCondition(1.0, func() float64 { return 0.0 }),
 								[]task.Effect{
@@ -804,7 +804,7 @@ func TestFromTaskTree(t *testing.T) {
 						nil,
 						[]*task.ExternalID{},
 						[]task.Event{},
-						[]*task.ConditionalDefinition{
+						[]task.ConditionalDefinition{
 							task.NewConditionalDefinition(
 								task.NewProbabilisticCondition(1.0, func() float64 { return 0.0 }),
 								[]task.Effect{
@@ -855,7 +855,7 @@ func TestFromTaskTree(t *testing.T) {
 							nil,
 							[]*task.ExternalID{},
 							[]task.Event{},
-							[]*task.ConditionalDefinition{
+							[]task.ConditionalDefinition{
 								task.NewConditionalDefinition(
 									task.NewAtLeastCondition(
 										1,
@@ -886,7 +886,7 @@ func TestFromTaskTree(t *testing.T) {
 								nil,
 								[]*task.ExternalID{},
 								[]task.Event{},
-								[]*task.ConditionalDefinition{},
+								[]task.ConditionalDefinition{},
 							)
 							return def
 						}(),
@@ -908,7 +908,7 @@ func TestFromTaskTree(t *testing.T) {
 								nil,
 								[]*task.ExternalID{},
 								[]task.Event{},
-								[]*task.ConditionalDefinition{},
+								[]task.ConditionalDefinition{},
 							)
 							return def
 						}(),
@@ -1002,7 +1002,7 @@ func TestFromTaskTree(t *testing.T) {
 							nil,
 							[]*task.ExternalID{},
 							[]task.Event{},
-							[]*task.ConditionalDefinition{
+							[]task.ConditionalDefinition{
 								task.NewConditionalDefinition(
 									task.NewAtLeastCondition(
 										1,
@@ -1033,7 +1033,7 @@ func TestFromTaskTree(t *testing.T) {
 								nil,
 								[]*task.ExternalID{},
 								[]task.Event{},
-								[]*task.ConditionalDefinition{
+								[]task.ConditionalDefinition{
 									task.NewConditionalDefinition(
 										task.NewProbabilisticCondition(1.0, func() float64 { return 0.0 }),
 										[]task.Effect{
@@ -1114,7 +1114,7 @@ func TestFromTaskTree(t *testing.T) {
 						nil,
 						[]*task.ExternalID{},
 						[]task.Event{},
-						[]*task.ConditionalDefinition{
+						[]task.ConditionalDefinition{
 							task.NewConditionalDefinition(
 								task.NewProbabilisticCondition(1.0, func() float64 { return 0.0 }),
 								[]task.Effect{
@@ -1190,7 +1190,7 @@ func TestFromTaskTreeError(t *testing.T) {
 						nil,
 						[]*task.ExternalID{},
 						[]task.Event{},
-						[]*task.ConditionalDefinition{},
+						[]task.ConditionalDefinition{},
 					)
 					return def
 				}(),
@@ -1219,7 +1219,7 @@ func TestFromTaskTreeError(t *testing.T) {
 								make(map[string]string),
 							),
 						},
-						[]*task.ConditionalDefinition{},
+						[]task.ConditionalDefinition{},
 					)
 					return def
 				}(),

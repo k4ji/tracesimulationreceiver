@@ -38,7 +38,7 @@ func TestBlueprint_Interpret(t *testing.T) {
 								Attributes: map[string]string{
 									"key2": "value2",
 								},
-								ConditionalDefinition: []*task.ConditionalDefinition{
+								ConditionalDefinition: []task.ConditionalDefinition{
 									task.NewConditionalDefinition(
 										task.NewProbabilisticCondition(0.1, mathRand.Float64),
 										[]task.Effect{

@@ -8,16 +8,16 @@ type Definition struct {
 	attributes             map[string]string
 	kind                   Kind
 	externalID             *ExternalID
-	delay                  Delay                    // Relative time from the start of the parent task
-	duration               Duration                 // Relative time from the start of the parent task
-	childOf                *ExternalID              // ID of the parent task (if any)
-	linkedTo               []*ExternalID            // IDs of linked spans (for producer/consumer relationships)
-	events                 []Event                  // Events associated with the task
-	conditionalDefinitions []*ConditionalDefinition // Conditional definitions for the task
+	delay                  Delay                   // Relative time from the start of the parent task
+	duration               Duration                // Relative time from the start of the parent task
+	childOf                *ExternalID             // ID of the parent task (if any)
+	linkedTo               []*ExternalID           // IDs of linked spans (for producer/consumer relationships)
+	events                 []Event                 // Events associated with the task
+	conditionalDefinitions []ConditionalDefinition // Conditional definitions for the task
 }
 
 // NewDefinition creates a new task definition
-func NewDefinition(name string, isResourceEntryPoint bool, resource *Resource, attributes map[string]string, kind Kind, externalID *ExternalID, delay Delay, duration Duration, childOf *ExternalID, linkedTo []*ExternalID, events []Event, conditionaldefinitions []*ConditionalDefinition) Definition {
+func NewDefinition(name string, isResourceEntryPoint bool, resource *Resource, attributes map[string]string, kind Kind, externalID *ExternalID, delay Delay, duration Duration, childOf *ExternalID, linkedTo []*ExternalID, events []Event, conditionalDefinitions []ConditionalDefinition) Definition {
 	return Definition{
 		name:                   name,
 		isResourceEntryPoint:   isResourceEntryPoint,
@@ -30,7 +30,7 @@ func NewDefinition(name string, isResourceEntryPoint bool, resource *Resource, a
 		childOf:                childOf,
 		linkedTo:               linkedTo,
 		events:                 events,
-		conditionalDefinitions: conditionaldefinitions,
+		conditionalDefinitions: conditionalDefinitions,
 	}
 }
 
@@ -78,6 +78,6 @@ func (d *Definition) Events() []Event {
 	return d.events
 }
 
-func (d *Definition) ConditionalDefinitions() []*ConditionalDefinition {
+func (d *Definition) ConditionalDefinitions() []ConditionalDefinition {
 	return d.conditionalDefinitions
 }

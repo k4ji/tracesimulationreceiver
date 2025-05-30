@@ -187,7 +187,7 @@ func TestSimulator_Run(t *testing.T) {
 						),
 					},
 					ChildOf: nil,
-					ConditionalDefinition: []*task.ConditionalDefinition{
+					ConditionalDefinition: []task.ConditionalDefinition{
 						task.NewConditionalDefinition(
 							task.NewProbabilisticCondition(1.0, mathRand.Float64),
 							[]task.Effect{

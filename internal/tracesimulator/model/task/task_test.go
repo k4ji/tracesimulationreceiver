@@ -19,7 +19,7 @@ func makeDefaultDefinition(name string) Definition {
 		nil,
 		make([]*ExternalID, 0),
 		make([]Event, 0),
-		[]*ConditionalDefinition{
+		[]ConditionalDefinition{
 			NewConditionalDefinition(
 				Condition{
 					kind:          ConditionKindProbabilistic,

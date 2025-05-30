@@ -33,5 +33,5 @@ func (c *ConditionalEffect) To() (*task.ConditionalDefinition, error) {
 		*condition,
 		effects,
 	)
-	return def, nil
+	return &def, nil
 }

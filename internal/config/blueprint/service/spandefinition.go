@@ -98,13 +98,13 @@ func (t *SpanDefinition) To() (*model.Task, error) {
 			events[i] = *d
 		}
 	}
-	var conditionalDefinitions []*domaintask.ConditionalDefinition
+	var conditionalDefinitions []domaintask.ConditionalDefinition
 	for _, effect := range t.ConditionalEffects {
 		def, err := effect.To()
 		if err != nil {
 			return nil, err
 		}
-		conditionalDefinitions = append(conditionalDefinitions, def)
+		conditionalDefinitions = append(conditionalDefinitions, *def)
 	}
 
 	return &model.Task{

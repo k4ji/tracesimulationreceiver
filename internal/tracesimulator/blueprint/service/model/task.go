@@ -16,7 +16,7 @@ type Task struct {
 	ChildOf               *domainTask.ExternalID
 	LinkedTo              []*domainTask.ExternalID
 	Events                []domainTask.Event
-	ConditionalDefinition []*domainTask.ConditionalDefinition
+	ConditionalDefinition []domainTask.ConditionalDefinition
 }
 
 // ToRootNodeWithResource converts the Task to a root node with the given resource

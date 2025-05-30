@@ -6,8 +6,8 @@ type ConditionalDefinition struct {
 	effects   []Effect
 }
 
-func NewConditionalDefinition(condition Condition, effects []Effect) *ConditionalDefinition {
-	return &ConditionalDefinition{
+func NewConditionalDefinition(condition Condition, effects []Effect) ConditionalDefinition {
+	return ConditionalDefinition{
 		condition: condition,
 		effects:   effects,
 	}
