@@ -7,8 +7,8 @@ type Resource struct {
 }
 
 // NewResource creates a new Resource with the given name and attributes
-func NewResource(name string, attributes map[string]string) *Resource {
-	return &Resource{
+func NewResource(name string, attributes map[string]string) Resource {
+	return Resource{
 		name:       name,
 		attributes: attributes,
 	}

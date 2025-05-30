@@ -20,7 +20,7 @@ type Task struct {
 }
 
 // ToRootNodeWithResource converts the Task to a root node with the given resource
-func (t *Task) ToRootNodeWithResource(resource *domainTask.Resource) (*domainTask.TreeNode, error) {
+func (t *Task) ToRootNodeWithResource(resource domainTask.Resource) (*domainTask.TreeNode, error) {
 	def := domainTask.NewDefinition(
 		t.Name,
 		true,
@@ -48,7 +48,7 @@ func (t *Task) ToRootNodeWithResource(resource *domainTask.Resource) (*domainTas
 	return node, nil
 }
 
-func (t *Task) toChildNodeWithResource(resource *domainTask.Resource) (*domainTask.TreeNode, error) {
+func (t *Task) toChildNodeWithResource(resource domainTask.Resource) (*domainTask.TreeNode, error) {
 	def := domainTask.NewDefinition(
 		t.Name,
 		false,

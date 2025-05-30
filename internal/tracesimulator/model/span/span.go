@@ -12,7 +12,7 @@ type TreeNode struct {
 	traceID              TraceID
 	name                 string
 	isResourceEntryPoint bool
-	resource             *task.Resource
+	resource             task.Resource
 	attributes           map[string]string
 	kind                 Kind
 	startTime            time.Time
@@ -221,7 +221,7 @@ func (n *TreeNode) IsResourceEntryPoint() bool {
 	return n.isResourceEntryPoint
 }
 
-func (n *TreeNode) Resource() *task.Resource {
+func (n *TreeNode) Resource() task.Resource {
 	return n.resource
 }
 

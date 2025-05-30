@@ -4,7 +4,7 @@ package task
 type Definition struct {
 	name                   string
 	isResourceEntryPoint   bool
-	resource               *Resource
+	resource               Resource
 	attributes             map[string]string
 	kind                   Kind
 	externalID             *ExternalID
@@ -17,7 +17,7 @@ type Definition struct {
 }
 
 // NewDefinition creates a new task definition
-func NewDefinition(name string, isResourceEntryPoint bool, resource *Resource, attributes map[string]string, kind Kind, externalID *ExternalID, delay Delay, duration Duration, childOf *ExternalID, linkedTo []*ExternalID, events []Event, conditionalDefinitions []ConditionalDefinition) Definition {
+func NewDefinition(name string, isResourceEntryPoint bool, resource Resource, attributes map[string]string, kind Kind, externalID *ExternalID, delay Delay, duration Duration, childOf *ExternalID, linkedTo []*ExternalID, events []Event, conditionalDefinitions []ConditionalDefinition) Definition {
 	return Definition{
 		name:                   name,
 		isResourceEntryPoint:   isResourceEntryPoint,
@@ -38,7 +38,7 @@ func (d *Definition) Name() string {
 	return d.name
 }
 
-func (d *Definition) Resource() *Resource {
+func (d *Definition) Resource() Resource {
 	return d.resource
 }
 

@@ -210,10 +210,11 @@ func TestSimulator_Run(t *testing.T) {
 		// Validate the first trace (service-a)
 		rootA := traces[0]
 		traceID := rootA.TraceID()
+		rootAResource := rootA.Resource()
 		assert.Equal(t, "root-task-a", rootA.Name())
-		assert.Equal(t, "service-a", rootA.Resource().Name())
+		assert.Equal(t, "service-a", rootAResource.Name())
 		assert.Equal(t, true, rootA.IsResourceEntryPoint())
-		assert.Equal(t, map[string]string{"env": "test"}, rootA.Resource().Attributes())
+		assert.Equal(t, map[string]string{"env": "test"}, rootAResource.Attributes())
 		assert.Equal(t, map[string]string{"key1": "value1"}, rootA.Attributes())
 		assert.Equal(t, span.KindServer, rootA.Kind())
 		assert.Equal(t, rootTaskAExternalID, rootA.ExternalID())
@@ -221,50 +222,56 @@ func TestSimulator_Run(t *testing.T) {
 		assert.Len(t, rootA.Children(), 2)
 
 		childA1 := rootA.Children()[0]
+		childA1Resource := childA1.Resource()
 		assert.Equal(t, traceID, childA1.TraceID())
 		assert.Equal(t, "child-task-a1", childA1.Name())
-		assert.Equal(t, "service-a", childA1.Resource().Name())
+		assert.Equal(t, "service-a", childA1Resource.Name())
 		assert.Equal(t, false, childA1.IsResourceEntryPoint())
 		assert.Equal(t, span.KindProducer, childA1.Kind())
 		assert.Equal(t, childTaskA1ExternalID, childA1.ExternalID())
 
 		childA2 := rootA.Children()[1]
+		childA2Resource := childA2.Resource()
 		assert.Equal(t, traceID, childA2.TraceID())
 		assert.Equal(t, "child-task-a2", childA2.Name())
-		assert.Equal(t, "service-a", childA2.Resource().Name())
+		assert.Equal(t, "service-a", childA2Resource.Name())
 		assert.Equal(t, false, childA2.IsResourceEntryPoint())
 		assert.Equal(t, span.KindInternal, childA2.Kind())
 		assert.Len(t, childA2.Children(), 1)
 
 		// Validate the child task, which is a service entry point
 		rootC := childA2.Children()[0]
+		rootCResource := rootC.Resource()
 		assert.Equal(t, traceID, rootC.TraceID())
 		assert.Equal(t, "root-task-c", rootC.Name())
-		assert.Equal(t, "service-c", rootC.Resource().Name())
+		assert.Equal(t, "service-c", rootCResource.Name())
 		assert.Equal(t, true, rootC.IsResourceEntryPoint())
 		assert.Equal(t, span.KindInternal, rootC.Kind())
 		assert.Equal(t, rootTaskCExternalID, rootC.ExternalID())
 
 		// Validate the second trace (service-b)
 		rootB := traces[1]
+		rootBResource := rootB.Resource()
 		assert.Equal(t, "root-task-b", rootB.Name())
-		assert.Equal(t, "service-b", rootB.Resource().Name())
+		assert.Equal(t, "service-b", rootBResource.Name())
 		assert.Equal(t, true, rootB.IsResourceEntryPoint())
 		assert.Equal(t, span.KindConsumer, rootB.Kind())
 		assert.Equal(t, rootTaskBExternalID, rootB.ExternalID())
 		assert.Len(t, rootB.Children(), 1)
 
 		childB1 := rootB.Children()[0]
+		childB1Resource := childB1.Resource()
 		assert.Equal(t, "child-task-b1", childB1.Name())
-		assert.Equal(t, "service-b", childB1.Resource().Name())
+		assert.Equal(t, "service-b", childB1Resource.Name())
 		assert.Equal(t, false, childB1.IsResourceEntryPoint())
 		assert.Equal(t, span.KindClient, childB1.Kind())
 		assert.Nil(t, childB1.ExternalID())
 
 		// Validate the third trace (service-d)
 		rootD := traces[2]
+		rootDResource := rootD.Resource()
 		assert.Equal(t, "root-task-d", rootD.Name())
-		assert.Equal(t, "service-d", rootD.Resource().Name())
+		assert.Equal(t, "service-d", rootDResource.Name())
 		assert.Equal(t, true, rootD.IsResourceEntryPoint())
 		assert.Equal(t, span.KindInternal, rootD.Kind())
 		assert.Nil(t, rootD.ExternalID())
@@ -275,7 +282,8 @@ func TestSimulator_Run(t *testing.T) {
 		assert.Len(t, rootB.LinkedTo(), 1)
 		linkedSpan := rootB.LinkedTo()[0]
 		assert.Equal(t, "child-task-a1", linkedSpan.Name())
-		assert.Equal(t, "service-a", linkedSpan.Resource().Name())
+		linkedSpanResource := linkedSpan.Resource()
+		assert.Equal(t, "service-a", linkedSpanResource.Name())
 	})
 
 	t.Run("adjust span timestamps to ensure all end before base end time", func(t *testing.T) {

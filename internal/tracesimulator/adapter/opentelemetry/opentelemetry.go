@@ -53,10 +53,11 @@ func (a *Adapter) processNode(otelTrace *ptrace.Traces, node *span.TreeNode, par
 
 func (a *Adapter) createOrGetScopeSpans(otelTrace *ptrace.Traces, node *span.TreeNode, parentScopeSpans *ptrace.ScopeSpans) (*ptrace.ScopeSpans, error) {
 	if node.IsResourceEntryPoint() {
+		spanResource := node.Resource()
 		resourceSpans := otelTrace.ResourceSpans().AppendEmpty()
 		resource := resourceSpans.Resource()
-		resource.Attributes().PutStr(string(semconv.ServiceNameKey), node.Resource().Name())
-		for k, v := range node.Resource().Attributes() {
+		resource.Attributes().PutStr(string(semconv.ServiceNameKey), spanResource.Name())
+		for k, v := range spanResource.Attributes() {
 			resource.Attributes().PutStr(k, v)
 		}
 		scopeSpans := resourceSpans.ScopeSpans().AppendEmpty()
