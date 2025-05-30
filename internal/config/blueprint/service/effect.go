@@ -38,7 +38,7 @@ type RecordEvent struct {
 func (e *Effect) To() (*task.Effect, error) {
 	switch e.Kind {
 	case "mark_as_failed":
-		e := task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect(&e.MarkAsFailed.Message))
+		e := task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect(e.MarkAsFailed.Message))
 		return &e, nil
 	case "annotate":
 		e := task.FromAnnotateEffect(task.NewAnnotateEffect(e.Annotate.Attributes))

@@ -29,7 +29,7 @@ func (s StatusCode) String() string {
 var (
 	StatusOK    = NewStatus(StatusCodeOK, nil)
 	StatusUnset = NewStatus(StatusCodeUnset, nil)
-	StatusError = func(msg *string) Status { return NewStatus(StatusCodeError, msg) }
+	StatusError = func(msg string) Status { return NewStatus(StatusCodeError, &msg) }
 )
 
 // Status represents the status of a span

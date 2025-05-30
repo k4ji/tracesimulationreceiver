@@ -42,7 +42,7 @@ func TestBlueprint_Interpret(t *testing.T) {
 									task.NewConditionalDefinition(
 										task.NewProbabilisticCondition(0.1, mathRand.Float64),
 										[]task.Effect{
-											task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect(ptrString("error"))),
+											task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect("error")),
 										},
 									),
 								},

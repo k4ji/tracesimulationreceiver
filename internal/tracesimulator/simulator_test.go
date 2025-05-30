@@ -191,7 +191,7 @@ func TestSimulator_Run(t *testing.T) {
 						task.NewConditionalDefinition(
 							task.NewProbabilisticCondition(1.0, mathRand.Float64),
 							[]task.Effect{
-								task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect(ptrString("error"))),
+								task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect("error")),
 							},
 						),
 					},
@@ -372,7 +372,7 @@ func TestSimulator_Run(t *testing.T) {
 		assert.Equal(t, span.StatusOK, childB1.Status())
 
 		rootD := traces[2]
-		assert.Equal(t, span.StatusError(ptrString("error")), rootD.Status())
+		assert.Equal(t, span.StatusError("error"), rootD.Status())
 	})
 
 	t.Run("fail to link spans with missing external IDs", func(t *testing.T) {

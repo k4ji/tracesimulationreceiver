@@ -50,7 +50,7 @@ func TestFromTaskTree(t *testing.T) {
 							task.NewConditionalDefinition(
 								task.NewProbabilisticCondition(1.0, func() float64 { return 1.0 }),
 								[]task.Effect{
-									task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect(ptrString("error"))),
+									task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect("error")),
 								},
 							),
 						})
@@ -710,7 +710,7 @@ func TestFromTaskTree(t *testing.T) {
 							task.NewConditionalDefinition(
 								task.NewProbabilisticCondition(0.5, func() float64 { return 0.4 }),
 								[]task.Effect{
-									task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect(ptrString("error"))),
+									task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect("error")),
 								},
 							),
 						},
@@ -731,7 +731,7 @@ func TestFromTaskTree(t *testing.T) {
 				attributes:           make(map[string]string),
 				startTime:            baseTime.Add(1 * time.Second),
 				endTime:              baseTime.Add(3 * time.Second),
-				status:               StatusError(ptrString("error")),
+				status:               StatusError("error"),
 				linkedTo:             []*TreeNode{},
 				events:               []Event{},
 				linkedToExternalID:   []*task.ExternalID{},
@@ -862,7 +862,7 @@ func TestFromTaskTree(t *testing.T) {
 										task.NewChildCondition(task.NewHasAttributeCondition("key1")),
 									),
 									[]task.Effect{
-										task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect(ptrString("error"))),
+										task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect("error")),
 									},
 								),
 							},
@@ -942,7 +942,7 @@ func TestFromTaskTree(t *testing.T) {
 				startTime:            baseTime,
 				endTime:              baseTime.Add(10 * time.Second),
 				events:               []Event{},
-				status:               StatusError(ptrString("error")),
+				status:               StatusError("error"),
 				children: []*TreeNode{
 					{
 						id:                   NewSpanID([8]byte{0x02}),
@@ -1009,7 +1009,7 @@ func TestFromTaskTree(t *testing.T) {
 										task.NewChildCondition(task.NewMarkedAsFailedCondition()),
 									),
 									[]task.Effect{
-										task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect(ptrString("error"))),
+										task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect("error")),
 									},
 								),
 							},
@@ -1037,7 +1037,7 @@ func TestFromTaskTree(t *testing.T) {
 									task.NewConditionalDefinition(
 										task.NewProbabilisticCondition(1.0, func() float64 { return 0.0 }),
 										[]task.Effect{
-											task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect(ptrString("error"))),
+											task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect("error")),
 										},
 									),
 								},
@@ -1073,7 +1073,7 @@ func TestFromTaskTree(t *testing.T) {
 				startTime:            baseTime,
 				endTime:              baseTime.Add(10 * time.Second),
 				events:               []Event{},
-				status:               StatusError(ptrString("error")),
+				status:               StatusError("error"),
 				children: []*TreeNode{
 					{
 						id:                   NewSpanID([8]byte{0x02}),
@@ -1085,7 +1085,7 @@ func TestFromTaskTree(t *testing.T) {
 						attributes:           make(map[string]string),
 						startTime:            baseTime.Add(0 * time.Second),
 						endTime:              baseTime.Add(5 * time.Second),
-						status:               StatusError(ptrString("error")),
+						status:               StatusError("error"),
 						parentID:             func() *ID { id := NewSpanID([8]byte{0x01}); return &id }(),
 						externalID:           nil,
 						linkedTo:             []*TreeNode{},
@@ -1118,7 +1118,7 @@ func TestFromTaskTree(t *testing.T) {
 							task.NewConditionalDefinition(
 								task.NewProbabilisticCondition(1.0, func() float64 { return 0.0 }),
 								[]task.Effect{
-									task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect(ptrString("error"))),
+									task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect("error")),
 									task.FromRecordEventEffect(task.NewRecordEventEffect(
 										task.NewEvent(
 											"event-name",
@@ -1146,7 +1146,7 @@ func TestFromTaskTree(t *testing.T) {
 				attributes:           make(map[string]string),
 				startTime:            baseTime.Add(1 * time.Second),
 				endTime:              baseTime.Add(3 * time.Second),
-				status:               StatusError(ptrString("error")),
+				status:               StatusError("error"),
 				linkedTo:             []*TreeNode{},
 				events: []Event{
 					NewEvent("event-name", baseTime.Add(2*time.Second), map[string]string{"key": "value"}),

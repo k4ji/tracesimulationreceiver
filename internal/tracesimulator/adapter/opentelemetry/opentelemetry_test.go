@@ -213,7 +213,7 @@ func TestAdapter_Transform(t *testing.T) {
 						task.NewConditionalDefinition(
 							task.NewProbabilisticCondition(1.0, mathRand.Float64),
 							[]task.Effect{
-								task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect(ptrString("error"))),
+								task.FromMarkAsFailedEffect(task.NewMarkAsFailedEffect("error")),
 							},
 						),
 					},
