@@ -6,13 +6,13 @@ import (
 
 // TreeNode represents a node in the task tree
 type TreeNode struct {
-	definition *Definition
+	definition Definition
 	parent     *TreeNode
 	children   []*TreeNode
 }
 
 // NewTreeNode creates a new TreeNode with a given ID and Definition
-func NewTreeNode(def *Definition) *TreeNode {
+func NewTreeNode(def Definition) *TreeNode {
 	return &TreeNode{
 		definition: def,
 		children:   make([]*TreeNode, 0),
@@ -52,7 +52,7 @@ func createsCycle(parent, child *TreeNode) bool {
 }
 
 func (n *TreeNode) Definition() *Definition {
-	return n.definition
+	return &n.definition
 }
 
 func (n *TreeNode) Parent() *TreeNode {

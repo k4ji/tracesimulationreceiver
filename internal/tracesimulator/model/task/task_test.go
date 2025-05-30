@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-func makeDefaultDefinition(name string) *Definition {
-	def, _ := NewDefinition(
+func makeDefaultDefinition(name string) Definition {
+	def := NewDefinition(
 		name,
 		false,
 		NewResource("test_service", make(map[string]string)),

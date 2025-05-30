@@ -27,8 +27,8 @@ func TestFromTaskTree(t *testing.T) {
 		{
 			name: "transform a root task to a span",
 			taskTree: task.NewTreeNode(
-				func() *task.Definition {
-					def, _ := task.NewDefinition(
+				func() task.Definition {
+					def := task.NewDefinition(
 						"root-task",
 						true,
 						task.NewResource("service-a", map[string]string{"service.version": "1.0.0"}),
@@ -85,8 +85,8 @@ func TestFromTaskTree(t *testing.T) {
 			name: "copy resource and attributes of a task into a span",
 			taskTree: func() *task.TreeNode {
 				root := task.NewTreeNode(
-					func() *task.Definition {
-						def, _ := task.NewDefinition(
+					func() task.Definition {
+						def := task.NewDefinition(
 							"root-task",
 							true,
 							task.NewResource("service-a", map[string]string{"service.version": "1.0.0"}),
@@ -106,8 +106,8 @@ func TestFromTaskTree(t *testing.T) {
 				//nolint:errcheck
 				root.AddChild(
 					task.NewTreeNode(
-						func() *task.Definition {
-							def, _ := task.NewDefinition(
+						func() task.Definition {
+							def := task.NewDefinition(
 								"child-task",
 								false,
 								task.NewResource("service-a", map[string]string{"service.version": "1.0.0"}),
@@ -181,8 +181,8 @@ func TestFromTaskTree(t *testing.T) {
 			name: "set start time relative to the parent span's start time",
 			taskTree: func() *task.TreeNode {
 				root := task.NewTreeNode(
-					func() *task.Definition {
-						def, _ := task.NewDefinition(
+					func() task.Definition {
+						def := task.NewDefinition(
 							"root-task",
 							true,
 							task.NewResource("service-a", make(map[string]string)),
@@ -202,8 +202,8 @@ func TestFromTaskTree(t *testing.T) {
 				//nolint:errcheck
 				root.AddChild(
 					task.NewTreeNode(
-						func() *task.Definition {
-							def, _ := task.NewDefinition(
+						func() task.Definition {
+							def := task.NewDefinition(
 								"child-task",
 								false,
 								task.NewResource("service-a", make(map[string]string)),
@@ -278,8 +278,8 @@ func TestFromTaskTree(t *testing.T) {
 			name: "set delay relative to the parent span's duration",
 			taskTree: func() *task.TreeNode {
 				root := task.NewTreeNode(
-					func() *task.Definition {
-						def, _ := task.NewDefinition(
+					func() task.Definition {
+						def := task.NewDefinition(
 							"root-task",
 							true,
 							task.NewResource("service-a", make(map[string]string)),
@@ -299,8 +299,8 @@ func TestFromTaskTree(t *testing.T) {
 				//nolint:errcheck
 				root.AddChild(
 					task.NewTreeNode(
-						func() *task.Definition {
-							def, _ := task.NewDefinition(
+						func() task.Definition {
+							def := task.NewDefinition(
 								"child-task",
 								false,
 								task.NewResource("service-a", make(map[string]string)),
@@ -375,8 +375,8 @@ func TestFromTaskTree(t *testing.T) {
 			name: "set event delay relative to the parent span's duration",
 			taskTree: func() *task.TreeNode {
 				root := task.NewTreeNode(
-					func() *task.Definition {
-						def, _ := task.NewDefinition(
+					func() task.Definition {
+						def := task.NewDefinition(
 							"root-task",
 							true,
 							task.NewResource("service-a", make(map[string]string)),
@@ -402,8 +402,8 @@ func TestFromTaskTree(t *testing.T) {
 				//nolint:errcheck
 				root.AddChild(
 					task.NewTreeNode(
-						func() *task.Definition {
-							def, _ := task.NewDefinition(
+						func() task.Definition {
+							def := task.NewDefinition(
 								"child-task",
 								false,
 								task.NewResource("service-a", make(map[string]string)),
@@ -488,8 +488,8 @@ func TestFromTaskTree(t *testing.T) {
 			name: "set duration relative to the parent span's duration",
 			taskTree: func() *task.TreeNode {
 				root := task.NewTreeNode(
-					func() *task.Definition {
-						def, _ := task.NewDefinition(
+					func() task.Definition {
+						def := task.NewDefinition(
 							"root-task",
 							true,
 							task.NewResource("service-a", make(map[string]string)),
@@ -509,8 +509,8 @@ func TestFromTaskTree(t *testing.T) {
 				//nolint:errcheck
 				root.AddChild(
 					task.NewTreeNode(
-						func() *task.Definition {
-							def, _ := task.NewDefinition(
+						func() task.Definition {
+							def := task.NewDefinition(
 								"child-task",
 								false,
 								task.NewResource("service-a", make(map[string]string)),
@@ -583,8 +583,8 @@ func TestFromTaskTree(t *testing.T) {
 		{
 			name: "record events based on probability",
 			taskTree: task.NewTreeNode(
-				func() *task.Definition {
-					def, _ := task.NewDefinition(
+				func() task.Definition {
+					def := task.NewDefinition(
 						"root-task",
 						true,
 						task.NewResource("service-a", make(map[string]string)),
@@ -639,8 +639,8 @@ func TestFromTaskTree(t *testing.T) {
 		{
 			name: "not record events based on probability",
 			taskTree: task.NewTreeNode(
-				func() *task.Definition {
-					def, _ := task.NewDefinition(
+				func() task.Definition {
+					def := task.NewDefinition(
 						"root-task",
 						true,
 						task.NewResource("service-a", make(map[string]string)),
@@ -693,8 +693,8 @@ func TestFromTaskTree(t *testing.T) {
 		{
 			name: "generate error spans",
 			taskTree: task.NewTreeNode(
-				func() *task.Definition {
-					def, _ := task.NewDefinition(
+				func() task.Definition {
+					def := task.NewDefinition(
 						"root-task",
 						true,
 						task.NewResource("service-a", make(map[string]string)),
@@ -741,8 +741,8 @@ func TestFromTaskTree(t *testing.T) {
 		{
 			name: "annotate span with attributes",
 			taskTree: task.NewTreeNode(
-				func() *task.Definition {
-					def, _ := task.NewDefinition(
+				func() task.Definition {
+					def := task.NewDefinition(
 						"root-task",
 						true,
 						task.NewResource("service-a", make(map[string]string)),
@@ -791,8 +791,8 @@ func TestFromTaskTree(t *testing.T) {
 		{
 			name: "annotate span without attributes",
 			taskTree: task.NewTreeNode(
-				func() *task.Definition {
-					def, _ := task.NewDefinition(
+				func() task.Definition {
+					def := task.NewDefinition(
 						"root-task",
 						true,
 						task.NewResource("service-a", make(map[string]string)),
@@ -842,8 +842,8 @@ func TestFromTaskTree(t *testing.T) {
 			name: "evaluate nested condition",
 			taskTree: func() *task.TreeNode {
 				root := task.NewTreeNode(
-					func() *task.Definition {
-						def, _ := task.NewDefinition(
+					func() task.Definition {
+						def := task.NewDefinition(
 							"root-task",
 							true,
 							task.NewResource("service-a", make(map[string]string)),
@@ -873,8 +873,8 @@ func TestFromTaskTree(t *testing.T) {
 				//nolint:errcheck
 				root.AddChild(
 					task.NewTreeNode(
-						func() *task.Definition {
-							def, _ := task.NewDefinition(
+						func() task.Definition {
+							def := task.NewDefinition(
 								"child-task-1",
 								false,
 								task.NewResource("service-a", make(map[string]string)),
@@ -895,8 +895,8 @@ func TestFromTaskTree(t *testing.T) {
 				//nolint:errcheck
 				root.AddChild(
 					task.NewTreeNode(
-						func() *task.Definition {
-							def, _ := task.NewDefinition(
+						func() task.Definition {
+							def := task.NewDefinition(
 								"child-task-2",
 								false,
 								task.NewResource("service-a", make(map[string]string)),
@@ -989,8 +989,8 @@ func TestFromTaskTree(t *testing.T) {
 			name: "conditions are evaluated from below to top",
 			taskTree: func() *task.TreeNode {
 				root := task.NewTreeNode(
-					func() *task.Definition {
-						def, _ := task.NewDefinition(
+					func() task.Definition {
+						def := task.NewDefinition(
 							"root-task",
 							true,
 							task.NewResource("service-a", make(map[string]string)),
@@ -1020,8 +1020,8 @@ func TestFromTaskTree(t *testing.T) {
 				//nolint:errcheck
 				root.AddChild(
 					task.NewTreeNode(
-						func() *task.Definition {
-							def, _ := task.NewDefinition(
+						func() task.Definition {
+							def := task.NewDefinition(
 								"child-task",
 								false,
 								task.NewResource("service-a", make(map[string]string)),
@@ -1101,8 +1101,8 @@ func TestFromTaskTree(t *testing.T) {
 		{
 			name: "apply multiple effects",
 			taskTree: task.NewTreeNode(
-				func() *task.Definition {
-					def, _ := task.NewDefinition(
+				func() task.Definition {
+					def := task.NewDefinition(
 						"root-task",
 						true,
 						task.NewResource("service-a", make(map[string]string)),
@@ -1177,8 +1177,8 @@ func TestFromTaskTreeError(t *testing.T) {
 		{
 			name: "error when relative duration is specified but no parent task is provided",
 			taskTree: task.NewTreeNode(
-				func() *task.Definition {
-					def, _ := task.NewDefinition(
+				func() task.Definition {
+					def := task.NewDefinition(
 						"root-task",
 						true,
 						task.NewResource("service-a", make(map[string]string)),
@@ -1200,8 +1200,8 @@ func TestFromTaskTreeError(t *testing.T) {
 		{
 			name: "error when event delay is greater than the task duration",
 			taskTree: task.NewTreeNode(
-				func() *task.Definition {
-					def, _ := task.NewDefinition(
+				func() task.Definition {
+					def := task.NewDefinition(
 						"root-task",
 						true,
 						task.NewResource("service-a", make(map[string]string)),

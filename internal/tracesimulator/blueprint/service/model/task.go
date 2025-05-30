@@ -21,7 +21,7 @@ type Task struct {
 
 // ToRootNodeWithResource converts the Task to a root node with the given resource
 func (t *Task) ToRootNodeWithResource(resource *domainTask.Resource) (*domainTask.TreeNode, error) {
-	def, err := domainTask.NewDefinition(
+	def := domainTask.NewDefinition(
 		t.Name,
 		true,
 		resource,
@@ -35,9 +35,6 @@ func (t *Task) ToRootNodeWithResource(resource *domainTask.Resource) (*domainTas
 		t.Events,
 		t.ConditionalDefinition,
 	)
-	if err != nil {
-		return nil, err
-	}
 	node := domainTask.NewTreeNode(def)
 	for _, child := range t.Children {
 		childNode, err := child.toChildNodeWithResource(resource)
@@ -52,7 +49,7 @@ func (t *Task) ToRootNodeWithResource(resource *domainTask.Resource) (*domainTas
 }
 
 func (t *Task) toChildNodeWithResource(resource *domainTask.Resource) (*domainTask.TreeNode, error) {
-	def, err := domainTask.NewDefinition(
+	def := domainTask.NewDefinition(
 		t.Name,
 		false,
 		resource,
@@ -66,9 +63,6 @@ func (t *Task) toChildNodeWithResource(resource *domainTask.Resource) (*domainTa
 		t.Events,
 		t.ConditionalDefinition,
 	)
-	if err != nil {
-		return nil, err
-	}
 	node := domainTask.NewTreeNode(def)
 	for _, child := range t.Children {
 		childNode, err := child.toChildNodeWithResource(resource)

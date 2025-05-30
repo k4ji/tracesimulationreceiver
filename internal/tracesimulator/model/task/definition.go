@@ -17,8 +17,8 @@ type Definition struct {
 }
 
 // NewDefinition creates a new task definition
-func NewDefinition(name string, isResourceEntryPoint bool, resource *Resource, attributes map[string]string, kind Kind, externalID *ExternalID, delay Delay, duration Duration, childOf *ExternalID, linkedTo []*ExternalID, events []Event, conditionaldefinitions []*ConditionalDefinition) (*Definition, error) {
-	return &Definition{
+func NewDefinition(name string, isResourceEntryPoint bool, resource *Resource, attributes map[string]string, kind Kind, externalID *ExternalID, delay Delay, duration Duration, childOf *ExternalID, linkedTo []*ExternalID, events []Event, conditionaldefinitions []*ConditionalDefinition) Definition {
+	return Definition{
 		name:                   name,
 		isResourceEntryPoint:   isResourceEntryPoint,
 		resource:               resource,
@@ -31,7 +31,7 @@ func NewDefinition(name string, isResourceEntryPoint bool, resource *Resource, a
 		linkedTo:               linkedTo,
 		events:                 events,
 		conditionalDefinitions: conditionaldefinitions,
-	}, nil
+	}
 }
 
 func (d *Definition) Name() string {
