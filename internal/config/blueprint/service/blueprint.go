@@ -30,7 +30,13 @@ type DefaultValues struct {
 func (bp *Blueprint) Validate() error {
 	refs := make(map[string]struct{})
 	for _, s := range bp.Services {
+		if s.Name == "" {
+			return fmt.Errorf("service name cannot be empty")
+		}
 		for _, sd := range s.SpanDefinitions {
+			if sd.Name == "" {
+				return fmt.Errorf("span name cannot be empty in service %s", s.Name)
+			}
 			if sd.Ref != nil {
 				if _, exists := refs[*sd.Ref]; exists {
 					return fmt.Errorf("duplicate span ref %s found", *sd.Ref)
