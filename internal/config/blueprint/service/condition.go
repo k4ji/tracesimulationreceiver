@@ -26,7 +26,7 @@ func (c *Condition) To() (*task.Condition, error) {
 	switch c.Kind {
 	case "probabilistic":
 		if c.Probabilistic == nil {
-			return nil, fmt.Errorf("probabilistic condition requires a threshold")
+			return nil, fmt.Errorf("probabilistic condition requires probabilistic configuration")
 		}
 		if c.Probabilistic.Threshold < 0 || c.Probabilistic.Threshold > 1 {
 			return nil, fmt.Errorf("probabilistic condition threshold must be between 0 and 1")
