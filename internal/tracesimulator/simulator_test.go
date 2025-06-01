@@ -495,7 +495,3 @@ func NewAbsoluteDurationDuration(duration time.Duration) task.Duration {
 	d, _ := task.NewDuration(e)
 	return *d
 }
-
-func ptrString(s string) *string {
-	return &s
-}

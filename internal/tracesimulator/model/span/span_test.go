@@ -1285,7 +1285,3 @@ func NewRelativeDurationDuration(v float64) task.Duration {
 	d, _ := task.NewDuration(e)
 	return *d
 }
-
-func ptrString(s string) *string {
-	return &s
-}
