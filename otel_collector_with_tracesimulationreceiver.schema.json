@@ -5,8 +5,8 @@
   "properties": {
     "receivers": {
       "type": "object",
-      "properties": {
-        "tracesimulationreceiver": {
+      "patternProperties": {
+        "tracesimulationreceiver(/[^/]*)?$": {
           "type": "object",
           "properties": {
             "global": {
@@ -80,10 +80,7 @@
           ]
         }
       },
-      "additionalProperties": true,
-      "required": [
-        "tracesimulationreceiver"
-      ]
+      "additionalProperties": true
     },
     "exporters": {
       "type": "object",
