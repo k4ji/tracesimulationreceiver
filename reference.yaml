@@ -132,8 +132,8 @@ receivers:
                       ## @param attributes - map of key/value pairs - optional
                       ## Attributes associated with the event (e.g., HTTP method, target).
                     attributes:
-                      http.method: GET
-                      http.target: /api/v1/resource
+                      http.request.method: GET
+                      url.path: /api/v1/resource
                 ## @param children - list of objects (same as spans) - optional
                 ## List of child spans that are executed after the parent span.
                 children:

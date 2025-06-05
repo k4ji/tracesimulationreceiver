@@ -67,8 +67,8 @@ receivers:
                 kind: server
                 parent: call_auth_service
                 attributes:
-                  http.target: /api/v1/session/validate
-                  http.method: GET
+                  url.path: /api/v1/session/validate
+                  http.request.method: GET
 
           - name: message_write_server
             resource:
@@ -82,16 +82,16 @@ receivers:
                       for: 0s
                       as: absolute
                     attributes:
-                      http.method: POST
-                      http.target: /api/v1/messages
+                      http.request.method: POST
+                      url.path: /api/v1/messages
                   - name: response_sent
                     delay:
                       for: "0.95"
                       as: relative
                     attributes:
-                      http.method: POST
-                      http.target: /api/v1/messages
-                      http.status_code: "200"
+                      http.request.method: POST
+                      url.path: /api/v1/messages
+                      http.response.status_code: "200"
                 conditional_effects:
                   - condition:
                       kind: probabilistic
@@ -309,8 +309,8 @@ receivers:
                 kind: server
                 parent: call_auth_service_read
                 attributes:
-                  http.target: /api/v1/session/validate
-                  http.method: GET
+                  url.path: /api/v1/session/validate
+                  http.request.method: GET
 
           - name: message_read_server
             resource:
@@ -403,8 +403,8 @@ receivers:
                 kind: server
                 parent: call_auth_service_search
                 attributes:
-                  http.target: /api/v1/session/validate
-                  http.method: GET
+                  url.path: /api/v1/session/validate
+                  http.request.method: GET
 
           - name: search_service
             resource:
@@ -498,8 +498,8 @@ receivers:
                 kind: server
                 parent: call_auth_service_search
                 attributes:
-                  http.target: /api/v1/session/validate
-                  http.method: GET
+                  url.path: /api/v1/session/validate
+                  http.request.method: GET
 
           - name: search_service
             resource:
@@ -589,8 +589,8 @@ receivers:
                 kind: server
                 parent: call_auth_service_search
                 attributes:
-                  http.target: /api/v1/session/validate
-                  http.method: GET
+                  url.path: /api/v1/session/validate
+                  http.request.method: GET
 
           - name: search_service
             resource:
@@ -646,7 +646,7 @@ receivers:
                       for: "0.1"
                       as: relative
                     attributes:
-                      http.url: https://api.stripe.com/v1/charges
+                      url.full: https://api.stripe.com/v1/charges
                       payment.gateway: stripe
 
 processors:

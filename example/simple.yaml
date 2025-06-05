@@ -41,16 +41,16 @@ receivers:
                       for: 0s
                       as: absolute
                     attributes:
-                      http.method: GET
-                      http.target: /api/v1/resource
+                      http.request.method: GET
+                      url.path: /api/v1/resource
                   - name: response_sent
                     delay:
                       for: "1.0"
                       as: relative
                     attributes:
-                      http.method: GET
-                      http.target: /api/v1/resource
-                      http.status_code: "200"
+                      http.request.method: GET
+                      url.path: /api/v1/resource
+                      http.response.status_code: "200"
                 children:
                   - name: produce_message_event
                     ref: produce_message_event

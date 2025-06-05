@@ -92,9 +92,9 @@ receivers:
                       for: "0.95"
                       as: relative
                     attributes:
-                      http.method: POST
-                      http.target: /api/v1/messages
-                      http.status_code: "200"
+                      http.request.method: POST
+                      url.path: /api/v1/messages
+                      http.response.status_code: "200"
                 conditional_effects:
                   - condition:
                       kind: probabilistic
