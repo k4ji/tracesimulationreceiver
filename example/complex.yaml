@@ -152,9 +152,9 @@ receivers:
                     duration:
                       for: "0.1"
                     attributes:
-                      db.operation: update_read_model
-                      db.system: postgres
-                      db.table: messages
+                      db.operation.name: update_read_model
+                      db.system.name: postgresql
+                      db.collection.name: messages
                   - name: trigger_notification_event
                     ref: trigger_notification_event-1
                     kind: producer
@@ -190,9 +190,9 @@ receivers:
                     duration:
                       for: "0.1"
                     attributes:
-                      db.operation: update_read_model
-                      db.system: postgres
-                      db.table: messages
+                      db.operation.name: update_read_model
+                      db.system.name: postgresql
+                      db.collection.name: messages
                   - name: trigger_notification_event
                     ref: trigger_notification_event-2
                     kind: producer
@@ -325,8 +325,8 @@ receivers:
                     duration:
                       for: "0.1"
                     attributes:
-                      db.system: redis
-                      db.operation: get
+                      db.system.name: redis
+                      db.operation.name: get
                   - name: fetch_message
                     kind: client
                     delay:
@@ -334,9 +334,9 @@ receivers:
                     duration:
                       for: "0.2"
                     attributes:
-                      db.system: postgres
-                      db.operation: select_enriched_message
-                      db.table: messages
+                      db.system.name: postgresql
+                      db.operation.name: select_enriched_message
+                      db.collection.name: messages
                   - name: send_read_response
                     kind: server
                     delay:
@@ -414,8 +414,8 @@ receivers:
                 kind: server
                 parent: route_search_request
                 attributes:
-                  db.system: elasticsearch
-                  db.operation: search
+                  db.system.name: elasticsearch
+                  db.operation.name: search
 
   tracesimulationreceiver/search_message_request_v2:
     global:
@@ -509,8 +509,8 @@ receivers:
                 kind: server
                 parent: route_search_request
                 attributes:
-                  db.system: elasticsearch
-                  db.operation: search
+                  db.system.name: elasticsearch
+                  db.operation.name: search
                 conditional_effects:
                   - condition:
                       kind: probabilistic
@@ -600,8 +600,8 @@ receivers:
                 kind: server
                 parent: route_search_request
                 attributes:
-                  db.system: elasticsearch
-                  db.operation: search
+                  db.system.name: elasticsearch
+                  db.operation.name: search
 
   tracesimulationreceiver/payment_request:
     global:

@@ -163,7 +163,7 @@ Add events to a span:
                       for: "0.1"
                       as: relative
                     attributes:
-                      db.system: postgresql
+                      db.system.name: postgresql
 ```
 
 ---
