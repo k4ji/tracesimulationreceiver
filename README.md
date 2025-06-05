@@ -129,8 +129,8 @@ receivers:
                     kind: producer
                     attributes:
                       messaging.system: kafka
-                      messaging.destination: message-topic
-                      messaging.operation: publish
+                      messaging.destination.name: message-topic
+                      messaging.operation.type: send
 ```
 
 </details>

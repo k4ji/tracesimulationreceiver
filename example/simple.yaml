@@ -60,8 +60,8 @@ receivers:
                     attributes:
                       team: backend
                       messaging.system: kafka
-                      messaging.destination: message-topic
-                      messaging.operation: publish
+                      messaging.destination.name: message-topic
+                      messaging.operation.type: send
           - name: consumer
             resource:
               service.version: 1.2.0
@@ -77,8 +77,8 @@ receivers:
                 attributes:
                   team: backend
                   messaging.system: kafka
-                  messaging.destination: message-topic
-                  messaging.operation: consume
+                  messaging.destination.name: message-topic
+                  messaging.operation.type: receive
                 links:
                   - produce_message_event
                 children:

@@ -126,8 +126,8 @@ receivers:
                     kind: producer
                     attributes:
                       messaging.system: kafka
-                      messaging.destination: message-topic
-                      messaging.operation: publish
+                      messaging.destination.name: message-topic
+                      messaging.operation.type: send
 
           - name: message_event_consumer
             resource:
@@ -145,7 +145,7 @@ receivers:
                 links: [ produce_message_kafka ]
                 attributes:
                   messaging.system: kafka
-                  messaging.destination: message-topic
+                  messaging.destination.name: message-topic
                 children:
                   - name: update_read_model
                     kind: client
@@ -163,9 +163,9 @@ receivers:
                     duration:
                       for: "0.1"
                     attributes:
-                      messaging.operation: publish
+                      messaging.operation.type: send
                       messaging.system: kafka
-                      messaging.destination: notification-topic
+                      messaging.destination.name: notification-topic
 
           - name: message_event_consumer
             resource:
@@ -183,7 +183,7 @@ receivers:
                 links: [ produce_message_kafka ]
                 attributes:
                   messaging.system: kafka
-                  messaging.destination: message-topic
+                  messaging.destination.name: message-topic
                 children:
                   - name: update_read_model
                     kind: client
@@ -201,9 +201,9 @@ receivers:
                     duration:
                       for: "0.1"
                     attributes:
-                      messaging.operation: publish
+                      messaging.operation.type: send
                       messaging.system: kafka
-                      messaging.destination: notification-topic
+                      messaging.destination.name: notification-topic
 
           - name: notification_service
             resource:
@@ -220,7 +220,7 @@ receivers:
                 links: [ trigger_notification_event-1, trigger_notification_event-2 ]
                 attributes:
                   messaging.system: kafka
-                  messaging.destination: notification-topic
+                  messaging.destination.name: notification-topic
                 children:
                   - name: send_email_notification
                     kind: client
@@ -242,7 +242,7 @@ receivers:
                 links: [ produce_message_kafka ]
                 attributes:
                   messaging.system: kafka
-                  messaging.destination: message-topic
+                  messaging.destination.name: message-topic
                 children:
                   - name: archive_message_event
                     kind: client
