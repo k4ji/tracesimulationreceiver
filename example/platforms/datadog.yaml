@@ -247,6 +247,7 @@ receivers:
                   - name: archive_message_event
                     kind: client
                     attributes:
+                      rpc.system: aws-api
                       rpc.service: S3
                       aws.s3.bucket: message-archive
                       aws.s3.key: str!! 2025-01-01
