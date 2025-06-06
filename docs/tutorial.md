@@ -216,4 +216,23 @@ This will mark 20% of these spans as errors with extra metadata.
 
 ---
 
+## 6. Shifting the Trace End Time with `end_time_offset`
+
+The timing of each span is calculated **relative to the end time of the last span in the longest trace**. By default, this end time is set to the current time, and all other spans' start and end times are back-calculated based on their delays and durations.
+
+You can control this end time directly using the `end_time_offset` field:
+
+```yaml
+receivers:
+  tracesimulationreceiver:
+    global:
+      end_time_offset: -15m
+```    
+
+With this feature, you can simulate delayed or backdated traces to 
+- Test how telemetry backends handle late-arriving or out-of-order data
+- Validate time-based retention or ingestion behavior in OpenTelemetry pipelines
+    
+---
+
 You're ready to start simulating real-world tracing scenarios. Happy tracing!
