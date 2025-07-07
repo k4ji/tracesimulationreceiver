@@ -161,7 +161,7 @@ docker run --rm --name jaeger \
   -p 16686:16686 \
   -p 4317:4317 \
   -p 4318:4318 \
-  jaegertracing/all-in-one:1.70.0
+  jaegertracing/all-in-one:1.71.0
 ```  
 
 2. Run the OpenTelemetry Collector with Trace Simulation Receiver (example config files are included in the provided
